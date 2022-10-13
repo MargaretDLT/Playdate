@@ -1,0 +1,38 @@
+{% include "header.html" %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Account Settings</title>
+    </head>
+
+    <body style="background-color: skyblue">
+        {% block content %} {% if user.is_authenticated %} {% include "registered_navbar.html" %} {% else %} {% include "general_navbar.html" %} {% endif %} {% endblock %}
+        <div class="wrapper">
+            <div class="card mx-auto my-3" style="padding-top: 5vh; border: solid blue; height: 90vh; width: 70vw">
+                <div class="card-body">
+                    <h1 style="text-align: center">Account Settings</h1>
+                    {% if user_id == request.user.id %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <hr />
+                        <h4 style="text-align: center">Delete your Account</h4>
+                        <p style="text-align: center">Deleting your account is permanent and irreversible! All data in relation to your account will be deleted as a result!</p>
+                        <button name="deleteAccount" style="margin-left: 45%" class="btn btn-primary pt-2" aria-current="true" type="submit">Delete Account</button>
+                        <hr />
+                    </form>
+
+                    {% else %}
+                    <div>
+                        <h2>The account you are trying to view does not belong to you!</h2>
+                        <a href="/">Back to Home</a>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        {% include "footer.html" %}
+    </body>
+</html>

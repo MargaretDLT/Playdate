@@ -1,0 +1,180 @@
+{% include "header.html" %}
+<!-- #marty -->
+
+<body style="background-color: #9de2ff;">
+
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% load static %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% load static %}
+    {% include "general_navbar.html" %}
+    {% endif %}
+    {% endblock %}
+    <div class="wrapper">
+        {% if user.is_authenticated %}
+        <br><br>
+        <h5 style="margin-left: 10%;"><b>Fun activities posted by our users:</b></h5>
+        {% if events %}
+        {% for event in events %}
+        {% with numerator=forloop.counter denominator=3 %}
+        {% load mathfilters %}
+        {% if numerator|mod:denominator == 1 %}
+        <div class="row" style="margin-left: 10%;">
+            {% endif %}
+            <div class="col-md-4 card mx-2 my-2" style="border-radius: 15px; width: 24rem;">
+                {% if event.banner.url != None %}
+                <img src={{event.banner.url}} style="width: 22rem; height: 30vh" class="card-img-top  mt-2" alt="...">
+                {% else %}
+                <img src="/media/publicevents_banner/default.jpeg" style="width: 22rem; height: 30vh"
+                    class="card-img-top  mt-2 mx-auto" alt="...">
+                {% endif %}
+                <div class="card-body">
+                    <p class="card-text">{{event.name}}</p><br>
+                    Posted BY: <a href="#">{{event.user.first_name}} {{event.user.last_name}}</a><br><br>
+                    <br><br>
+                    {% if user.is_authenticated and regUser %}
+                    <div class="row">
+                        <a href="/events/{{event.event_id}}" class="col-4 btn btn-primary mx-4">View details</a>
+                        <form method="POST" action="/events/register/{{event.event_id}}/" class="col mx-4">
+                            {% csrf_token %}
+                            <button name="rsvp" class="btn btn-primary pt-2" type="submit">Register</button>
+                        </form>
+                    </div>
+                    {% elif user.is_authenticated and not regUser %}
+
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop">
+                        View Details
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="staticBackdropLabel">You're not Verified!</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Sorry, it seems you're not verified yet!<br>
+                                    Please go to your <a href="/profile">Profile</a> to upload your identification photo
+                                    for
+                                    verification!
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- <a href="/events/signUpSucceed" class="btn btn-primary mx-4">Sign
+                        Up</a> -->
+                </div>
+            </div>
+            {% if numerator|mod:denominator == 0 %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        {% endfor %}
+        {% else %}
+        <h5 style="margin-left: 10%;"> <b>No events available currently</b></h5><br><br>
+        {% endif %}
+        {% endif %}
+    </div>
+    <br><br>
+    <div class="wrapper">
+
+        <h5 style="margin-left: 10%;"><b>Public activities for everyone:</b></h5>
+
+        {% if publicevents %}
+        <!-- <div class="row grid-container">
+            <h5 style="margin-left: 10%;"><b>Public activities for everyone:</b></h5>
+        </div> -->
+        <div class="row" style="margin-left: 10%;">
+
+            {% for publicevent in publicevents %}
+            <div class="col-md-4 card mx-2 my-2" style="border-radius: 15px; width: 24rem;">
+                <img src={{publicevent.banner.url}} style="width: 22rem; height: 30vh" class="card-img-top  mt-2"
+                    alt="...">
+                <div class="card-body">
+                    <p class="card-text">{{publicevent.name}}</p>
+                    <a href="/events/public-event/{{publicevent.public_event_id}}" class="btn btn-primary">View
+                        details</a>
+                </div>
+            </div>
+
+            {% endfor %}
+
+            <!-- <div class="col card mx-2 my-2" style="width: 18rem;">
+                <img src="{% static 'media/outdoor-movies.jpeg' %}" class="card-img-top  mt-2" width="300px"
+                    height="300px" alt="...">
+                <div class="card-body">
+                    <p class="card-text">East Bay Outdoor Summer Movie Round-Up</p><br>
+                    <a href="#" class="btn btn-primary">View details</a>
+                </div>
+            </div>
+
+            <div class="col card mx-2 my-2" style="width: 18rem;">
+                <img src="{% static 'media/oakland-ice-kids-skate.jpeg' %}" class="card-img-top mt-2" width="300px"
+                    height="300px" alt="...">
+                <div class="card-body">
+                    <p class="card-text">Indoor Ice Skating in Oakland at Oakland Ice</p><br>
+                    <a href="#" class="btn btn-primary">View details</a>
+                </div>
+            </div> -->
+        </div>
+        {% else %}
+        <h5 style="margin-left: 10%;"><b>No public events currently</b></h5>
+        {% endif %}
+
+    </div>
+    {% include "footer.html"%}
+</body>
+<style>
+    @media (min-width: 900px) {
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            align-items: center;
+
+            max-width: 1000px;
+            margin: auto;
+            display: grid;
+        }
+
+    }
+
+    @media (max-width: 900px) {
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media only screen and (max-width: 600px) {
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+
+    .card-body {}
+
+    #descText {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+    }
+</style>
+
+</html>

@@ -1,0 +1,278 @@
+<!--
+░█▄█░█▀█░▀█▀░█▀█░░░█▀▀░█▀▄░█▀█░█░█░█▀█░░░█▀█░█▀█░█▀▀░█▀▀
+░█░█░█▀█░░█░░█░█░░░█░█░█▀▄░█░█░█░█░█▀▀░░░█▀▀░█▀█░█░█░█▀▀
+░▀░▀░▀░▀░▀▀▀░▀░▀░░░▀▀▀░▀░▀░▀▀▀░▀▀▀░▀░░░░░▀░░░▀░▀░▀▀▀░▀▀▀
+
+Contributor(s): AndrewC, 
+Version: 1.8.3
+Documentation page: http://bedev.playdate.surge.sh/docs.html
+Description: This is the groups page. It is a huge html file because it is dynamic and encompasses cases where the user is not logged in, the user is not a member, and where the user is a member
+The django data elements are stored in the context as well as in the session data within requests.
+-->
+
+{% load static %}{% include "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Group View Testing</title>
+</head>
+
+<body style="background-color: #7ecae6;">
+    <!--🐱Navbar Content🐱-->
+    {% block content %} {% if user.is_authenticated %} {% load static %} {% include "registered_navbar.html" %} {%else%}
+    {% load static %} {% include "general_navbar.html" %} {% endif %} {% endblock %} <br>
+    
+    {% if myProfile.is_verified == True %}
+    <div class="wrapper mt-4">
+        <div class="row">
+            <div class="col-lg-4" style="margin-left:8vw">
+                <div class="card">
+                    <div class="card-header">Group Image</div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            {% if group.banner.url != None %}
+                            <img src="{{group.banner.url}}" style="width: 20vw; height: 20vh" alt="" />
+                            {% else %}
+                            <img src="/media/publicevents_banner/default.jpeg" style="width: 20vw; height: 20vh"
+                                alt="" />
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Group Info</div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <span class="groupName" style="text-align: center"> <b>Group name:
+                                </b>{{group.group_name}}</span>
+                            <span class="groupName" style="text-align: center"> <b>Group Admin: </b>
+                                {{group.group_admin}}</span>
+
+                            <p style="text-align: center"><b>Group size:</b> {{member_list|length}} people</p>
+                            <span class="groupName" style="text-align: center"><b>Created on: </b>{{group.create_date}}
+                            </span>
+                            <p style="text-align: center"><b>Keywords: </b><i>{% if group.tags.all %}
+                                    {% for tag in group.tags.all %} {{tag}} {% endfor %}
+                                    {% else %} No Keywords
+                                    {%endif %}</i></p>
+                            {% if user.is_authenticated and isMember == False %}
+                            {% if regUser %}
+
+                            {% else %}
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#staticBackdrop">
+                                Join Group
+                            </button><br>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="staticBackdropLabel">You're not Verified!</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Sorry, it seems you're not verified yet!<br>
+                                            Please go to your <a href="/profile">Profile</a> to upload your
+                                            identification photo for
+                                            verification!
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% endif %}
+                            {% endif %}
+                            <form method="POST">
+                                {% csrf_token %}
+                                <span style="display: flex; justify-content: space-between;">
+                                    {% if isMember == True %}
+                                    <button name="newGroupEvent"
+                                        class="list-group-item list-group-item-action py-2 ripple bg-light"
+                                        aria-current="true" type="submit">New Event</button>
+                                    <button name="newPost"
+                                        class="list-group-item list-group-item-action py-2 ripple bg-light"
+                                        aria-current="true" type="submit">New Post</button>
+                                    {% if request.user == group.group_admin%}
+                                    <button name="leaveGroupAdmin"
+                                        class="list-group-item list-group-item-action py-2 ripple bg-light"
+                                        aria-current="true" type="submit">Disband Group</button>
+                                    {% elif isMember == True and request.user != group.group_admin %}
+                                    <button name="leaveGroup"
+                                        class="list-group-item list-group-item-action py-2 ripple bg-light"
+                                        aria-current="true" type="submit">Leave Group</button>
+                                    {% endif %}
+                                    {% elif isMember == False %}
+                                    <button name="joinGroup"
+                                        class="list-group-item list-group-item-action py-2 ripple bg-light"
+                                        aria-current="true" type="submit">Join Group</button>
+                                    {% endif %}
+
+                                </span>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Group Description</div>
+                    <div class="card-body">
+                        <p style="text-align: center">{{group.group_desc}}</p>
+                    </div>
+                </div>
+            </div>
+            {% if isMember == True %}
+            <div class="col-lg-6">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between;" class="bg-light">
+                        <span class="mx-4">Group Events</span>
+                        <button style="text-align: right;" class="btn" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseGroupEvent" aria-expanded="false" aria-controls="collapseExample">
+                            {% load static %}
+                            <img src="{% static 'media/enlarge.png' %}" width="25" height="25" alt="martin" />
+                        </button>
+                    </div>
+
+                    <div class="collapse show card-body" id="collapseGroupEvent">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            {% if groupEvents %}
+                            {% for event in groupEvents %}
+                            <div class="row">
+                                <div class="col card" style="width: 50%;">
+                                    {% if event.banner.url != None %}
+                                    <img src="{{event.banner.url}}" class="card-img-top" />
+                                    {% else %}
+                                    <img src="/media/publicevents_banner/default.jpeg" class="card-img-top" />
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{event.name}}</h5>
+                                        <p class="card-text">{{event.desc}}</p>
+                                        <strong>On : {{event.datetime}}</strong>
+                                        <div class="d-flex flex-row" style="text-align:left">
+                                            {% include "groups/userlink_template.html" %}
+                                        </div>
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            <a href="{% url 'viewGroupEvent' group_id=group.group_id event_id=event.event_id %}"
+                                                name="eventDetails" value="{{event.event_id}}"
+                                                class="btn btn-primary pt-2">Event
+                                                Details</a>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div><br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between;" class="bg-light">
+                        <span class="mx-4">Group Posts</span>
+                        <button style="text-align: right;" class="btn" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseGroupPost" aria-expanded="false" aria-controls="collapseExample">
+                            {% load static %}
+                            <img src="{% static 'media/enlarge.png' %}" width="25" height="25" alt="martin" />
+                        </button>
+                    </div>
+
+
+                    <div class="collapse card-body" id="collapseGroupPost">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            {% if groupPosts %} {% for post in groupPosts %}
+                            <div class="row">
+                                <div class="col card" style="width: 50%;">
+                                    {% if post.banner %}
+                                    <img src="{{post.banner.url}}" class="card-img-top" />
+                                    {% else %}
+                                    <img src="/media/publicevents_banner/default.jpeg" class="card-img-top" />
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{post.post_title}}</h5>
+                                        <p class="card-text">{{post.desc}}</p>
+                                        <strong>Created On: {{post.created_on}}</strong>
+                                        <div class="d-flex flex-row align-items-center">
+                                            {% include "groups/userlink_template.html" %}
+                                        </div>
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            <a href="{% url 'viewGroupPost' group_id=group.group_id post_id=post.post_id %}"
+                                                name="postDetails" value="{{post.post_id}}"
+                                                class="btn btn-primary pt-2">View Discussion</a>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div><br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between;" class="bg-light">
+                            <span class="mx-4">Group Members</span>
+                            <button style="text-align: right;" class="btn" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseGroupMmebers" aria-expanded="false"
+                                aria-controls="collapseExample">
+                                {% load static %}
+                                <img src="{% static 'media/enlarge.png' %}" width="25" height="25" alt="martin" />
+                            </button>
+                        </div>
+                        <div class="collapse card-body" id="collapseGroupMmebers">
+                            {% if member_list %}
+                            <table class="table text-center mx-auto" style="width: 70%;">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">User ID </th>
+                                        <th scope="col">Username</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for member in member_list %}
+                                    <tr class="inner-box">
+                                        <td>
+                                            <p>{{member.member_id.id}}</p>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'profileView' profile_id=member.member_id.id %}">
+                                                {{member.member_id}}</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            {% else %}
+                            <p>No members error; there should at least be 0 member</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% elif myProfile.is_verified == False  %}
+        {% include "groups/verifyYourself.html" %}
+        {% elif not user.is_authenticated %}
+            <div class="container mt-5 mb-5" style="height: 100vh">
+                <h1 style="text-align: center">You need to be logged in to join Groups!</h1>
+                <h4 style="text-align: center"><a href="/register/">🐱Register here!</a>•Already registered?•<a
+                        href="/login/">Login Here!🐱</a></h4>
+            </div>
+
+        {% endif %}
+
+        {% include "footer.html" %}
+</body>
+
+</html>

@@ -1,0 +1,154 @@
+{% include "header.html" %}
+
+<body>
+
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% load static %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% load static %}
+    {% include "general_navbar.html" %}
+    {% endif %}
+    {% endblock %}
+
+    <div class="wrapper mt-4">
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <h2>My Groups: </h2>
+            </div>
+            <div class="col-lg-3">
+                {% if user.is_authenticated and regUser %}
+                <a href="/groups/createGroup" class="btn btn-primary">Create Your Group</a>
+
+                {% elif user.is_authenticated and not regUser %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    Create Your Group
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropLabel">You're not Verified!</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Sorry, it seems you're not verified yet!<br>
+                                Please go to your <a href="/profile">Profile</a> to upload your identification photo for
+                                verification!
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    Create Your Group
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropLabel">You're Not Logged In!</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Sorry, it seems you're not logged in yet. <br>
+                                Please Log In <a href="/register">Here</a>!
+                                If you don't have an account, you can also sign up <a href="/login">Here</a>!
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif%}
+            </div>
+        </div><br>
+        <!-- row end-->
+        <div class="row mt-4">
+            <div class="col-lg-9 mx-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center" scope="col">Group </th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% if groupList %}
+                        {% for group in groupList %}
+                        <tr class="inner-box">
+                            <td>
+                                {% if group.banner.url != None %}
+                                <div class="col-sm-5">
+                                    <img src="{{group.banner.url}}" style="width: 20vw; height: 20vh" alt="" />
+                                </div>
+                                {% else %}
+                                <div class="col-sm-5">
+                                    <img src="/media/publicevents_banner/default.jpeg" style="width: 20vw; height: 20vh"
+                                        alt="" />
+                                </div>
+
+                                {% endif %}
+
+                            </td>
+                            <td>
+                                <div class="event-wrap">
+                                    <span><a href="/createdGroup"></a></span><br><br>
+                                    <div class="meta">
+                                        <div class="group name">
+                                            <a
+                                                href="{% url 'groupView' group_id=group.group_id %}"><strong>{{group.group_name}}</strong></a><br><br>
+                                        </div>
+
+                                        <div class="organizers">
+                                            <b>Group Admin:</b> <a
+                                                href="{% url 'profileView' profile_id=group.group_admin.id %}">{{group.group_admin}}</a><br><br>
+                                        </div>
+                                        <div class="desc">
+                                            <b>Description:</b>{{group.group_desc}}<br><br>
+                                        </div>
+                                        <!-- Implement member count later; running out of time right now
+                                        <div class="Member Count">
+                                                <b>Member Count: </a><br><br>
+                                        </div>
+                                         -->
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{% url 'groupView' group_id=group.group_id %}" class="btn btn-primary">Group
+                                    Page</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <!-- /col end-->
+    </div>
+    {% include "footer.html" %}
+
+</body>
+
+
+</html>

@@ -1,0 +1,56 @@
+{% comment %}
+// tagListInput.html
+//
+//  This template includes the html and the js to include a tag list with a 
+// text field for adding tags. To see how the tag list itself works, see 
+// 'tagList.html', which is included at the core of this template. This 
+// template adds a text field. when the user puts a space separated word 
+// into the text field, the word gets added as a separate tag to the tag 
+// list.
+//
+// When using this template, you should emulate the following:
+// {% include 'tagListInput.html' with 
+//      tlId=1 
+//      tlAttribute="tags" 
+//      tlContent="bears,browns,chicago,cleveland,house,party,house_party,nachos,tacos,burritos,pizza,spaghetti,rupert,murdock,burgers_for_the_poor_sports_for_the_fools_comics_for_the_nerds,spinach,lettuce,tomato,onion,patty,wagyu,beef"  %}
+// NOTE: this is presented on multiple lines for readability. When using it,
+//  you will need to compress the include tag to a single line.
+//
+// tlID:--------------------------------------------------------------------
+//  An identifier to separate multiple tagList includes in the same file
+//
+// tlAttribute:-------------------------------------------------------------
+//  The name of the attribute of the form that relates to this tagList.
+//  For example, if you have a model named Group that has an attribute 
+//  'tags', tlAttribute would be 'tags'.
+//
+// tlContent:-------------------------------------------------------OPTIONAL
+// The string of tags to populate the list with. If this gets changed, the
+//  the entire list should be changed.
+{% endcomment %}
+
+<script>
+    var tliInput_{{tlId}};
+
+    // Init the input
+    function initTagListInput_{{tlId}}(){
+        tliInput_{{tlId}} = document.getElementById('tliInput_{{tlId}}');
+        tliInput_{{tlId}}.addEventListener("input", handleInput_{{tlId}})
+    }
+
+    // If a space was the last letter entered,
+    // add the text to the tag list
+    function handleInput_{{tlId}}(event){
+        let input = tliInput_{{tlId}}.value;
+        if (input[input.length-1] == " ") {
+            tliInput_{{tlId}}.value = "";
+            addTag_{{tlId}}(input.trim().toLowerCase());
+        }
+    }
+    window.addEventListener('DOMContentLoaded', initTagListInput_{{tlId}});
+</script>
+
+<div class="tliContainer">
+    <input id="tliInput_{{tlId}}" class="form-input p-1 m-1" type="text" placeholder="Enter a tag then a space">
+    {% include 'tagList.html' %}
+</div>

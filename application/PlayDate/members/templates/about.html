@@ -1,0 +1,51 @@
+{% include "header.html" %}
+
+
+<body style="background-color: #9de2ff;">
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% load static %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% load static %}
+    {% include "general_navbar.html" %}
+    {% endif %}
+    {% endblock %}
+    <div class="wrapper">
+        <div class="text-center">
+            <h4>Software Engineering class SFSU</h4>
+            <h5>Summer 2022 <br> Section 01 <br> Team 03</h5>
+        </div>
+    
+        <div class="card mx-auto mt-3" style="width: 30rem;">
+            <div class="card-header">
+                <h4 class="lead">The BabySitters</h4>
+                <div class="fst-italic">
+                    <p>Our aim is to make your kids and pets free time memorable by connecting them with their playdates.
+                    </p>
+                </div>
+            </div><br>
+
+
+            <div class="card-body d-grid mx-5 gap-3 justify-content-center">
+                <button type="button" class="btn btn-info rounded-pill" onclick="location.href='soujanya/'"> Team Member 1
+                    {{member1}}</button>
+                <button type="button" class="btn btn-info rounded-pill" onclick="location.href='andy/'"> Team Member 2
+                    {{member2}}</button>
+                <button type="button" class="btn btn-info rounded-pill" onclick="location.href='margaret/'"> Team Member 3
+                    {{member3}}</button>
+                <button type="button" class="btn btn-info rounded-pill" onclick="location.href='martin/'"> Team Member 4
+                    {{member4}}</button>
+                <button type="button" class="btn btn-info rounded-pill" onclick="location.href='qin/'"> Team Member 5
+                    {{member5}}</button>
+                <button type="button" class="btn btn-info rounded-pill" onclick="location.href='william/'"> Team Member 6
+                    {{member6}}</button>
+                <button type="button" class="btn btn-info rounded-pill" onclick="location.href='victor/'"> Team Member 7
+                    {{member7}}</button>
+            </div> 
+        </div>
+    </div>
+    {% include 'footer.html' %}
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+{% load static %}
+{% include "header.html" %}
+
+<body style="background-color: #9de2ff;">
+    <div>
+        <a href="/">
+            <h5 style="font-family: 'Gill Sans', sans-serif;color: #0d6efd; text-align: center; margin-top: 30px;">
+                <b>PlayDate</b>
+            </h5>
+        </a>
+    </div>
+    
+    <div class="card mx-auto mt-2" style="width: {% block width %}50rem;{% endblock %}">
+        <div class="card-body">
+        {% block content %} 
+        {% endblock %} 
+        </div>
+    </div>
+    {% include "footer.html" %}
+</body>
+</html>

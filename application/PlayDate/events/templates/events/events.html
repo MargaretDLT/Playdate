@@ -1,0 +1,234 @@
+{% include "header.html" %}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+<body>
+    {% block content %} {% if user.is_authenticated %} {% load static %} {% include "registered_navbar.html" %} {%else%}
+    {% load static %} {% include "general_navbar.html" %} {% endif %} {% endblock %}
+
+    <br />
+    <!-- <h1>Search Page</h1>
+
+        <br/>
+        <form action="{% url 'events' %}" method="GET" value="{{request.GET.q}}"> 
+            <input type="text" name="q" value="{{request.GET.q}}" placeholder="city"/>
+            <input type="submit" name="submit" value="Search"/>
+        </form> -->
+    <!-- Empty Search sends you home -->
+    {% if submitbutton == 'Search' and request.GET.q == '' %}
+    <div>Hello There nothing in here</div>
+    <meta http-equiv="Refresh" content="0; url='/" />
+    {% endif %}
+
+    {% if submitbutton == 'Search' and request.GET.q != '' %}
+
+    {% if results %}
+
+    <!-- <div class="form-group col-sm-8 col-md-6" action="{% url 'events' %}" method="GET" value="{{request.GET.category}}">
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="pets" name="category" value="pets">
+                        <label class="checkbox-inline"> Pets </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="kids" name="category" value="kids">
+                        <label class="checkbox-inline"> Kids </label>
+                    </div>
+                    <button class="btn btn-outline-success" type="submit" name="submit" value="submit">Filter</button>
+                </div> -->
+
+    <!-- result found -->
+
+    <div class="grid-container">
+        <div style=" padding: 15% 0px 0px 0px;">
+            <h5><b>Public activities for everyone:</b></h5>
+        </div>
+        <!-- <div style=" padding: 30px 0px 0px 0px; float: right;">
+            
+            <label class="small mb-1" for="filter">Filter</label>
+            <select id="filter" name="filter" value="">
+                <option value="ALL">All</option>
+                <option value="AL">Catagories</option>
+                <option value="AL">Tags</option>
+                <option value="AL">Location</option>
+
+            </select> -->
+        </div>
+    </div>
+    <div class="grid-container">
+
+
+        <table class="table widget-26">
+            <tbody>
+                {% for result in results %}
+
+
+                <div class="col card mx-2 my-2" style="width: 18rem;">
+                    {% if result.banner.url != None %}
+
+                    <img src="{{result.banner.url}}" alt="" class="card-img-top mt-2" width="300px" height="300px" />
+
+                    {% else %}
+
+                    <img src="/media/publicevents_banner/default.jpeg" class="card-img-top mt-2" width="300px"
+                        height="300px" alt="..." />
+
+                    {% endif %}
+                    <div class="event_name">
+                        <a href="/events/publicEvent1" target="_blank" class="url">{{result.name}}</a>
+                        <p class="m-0"></p>
+                    </div>
+                    <p>
+                        <span lass="card-text">
+                            {{result.address.street}}, {{result.address.city}},
+                            {{result.address.state}},
+                            {{result.address.country}} - {{result.address.zipcode}}
+                        </span>
+                    </p>
+                    <div class="card-body">
+                        <a href="/events/publicEvent1" class="btn btn-primary">View details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+    {% else %}
+    <!-- Crazy input not found -->
+
+    <div class="grid-container">
+
+        <div class="gal-detail thumb" style="font-size: 130%;">
+            <Header>No results found please try again</Header>
+        </div>
+
+    </div>
+
+    {% endif %}
+    {% endif %}
+    {% include "footer.html" %}
+</body>
+<style>
+    body {
+        margin-top: 20px;
+        background-color: #9de2ff;
+    }
+
+    .portfolioFilter a {
+        -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.1);
+        -moz-transition: all 0.3s ease-out;
+        -ms-transition: all 0.3s ease-out;
+        -o-transition: all 0.3s ease-out;
+        -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.1);
+        -webkit-transition: all 0.3s ease-out;
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.1);
+        color: #333333;
+        padding: 5px 10px;
+        display: inline-block;
+        transition: all 0.3s ease-out;
+    }
+
+    .portfolioFilter a:hover {
+        background-color: #228bdf;
+        color: #ffffff;
+    }
+
+    .portfolioFilter a.current {
+        background-color: #228bdf;
+        color: #ffffff;
+    }
+
+    .thumb {
+        background-color: #ffffff;
+        border-radius: 3px;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+        padding-bottom: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 10px;
+        width: 100%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
+        width: 18rem;
+
+    }
+
+    .thumb-img {
+        border-radius: 2px;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .gal-detail h4 {
+        margin: 16px auto 10px auto;
+        width: 80%;
+        white-space: nowrap;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gal-detail .ga-border {
+        height: 3px;
+        width: 40px;
+        background-color: #228bdf;
+        margin: 10px auto;
+    }
+
+    .grid-container {
+        width: 95%;
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+
+        grid-gap: 1em;
+        grid-template-columns: repeat(3, minmax(15em, 1fr));
+
+    }
+
+    @media(min-width:100em) {
+        .grid-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 1em;
+
+        }
+    }
+</style>
+<!-- Andy's code  -->
+<!-- <tr>
+                                <td>
+                                    {% if result.banner.url != None %}
+                                    <div class="event_banner">
+                                        <img src="{{result.banner.url}}" style="width: 5vw; height: 3vh" alt="" />
+                                    </div>
+                                    {% else %}
+                                    <div class="event_banner">
+                                        <img src="/media/publicevents_banner/default.jpeg"
+                                            style="width: 5vw; height: 3vh" alt="" />
+                                    </div>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div class="event_name">
+                                        <a href="/events/publicEvent1" target="_blank" class="url">{{result.name}}</a>
+                                        <p class="m-0"></p>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="widget">
+                                        <p class="text-muted m-0">
+                                            <span class="location">
+                                                {{result.address.street}}, {{result.address.city}},
+                                                {{result.address.state}},
+                                                {{result.address.country}} - {{result.address.zipcode}}</span>
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr> -->

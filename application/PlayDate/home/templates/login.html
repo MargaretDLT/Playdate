@@ -1,0 +1,48 @@
+{% include "header.html" %}
+
+<body style="background-color: #9de2ff;">
+    <div class="wrapper">
+        <div>
+            <a href="/">
+                <h5 style="text-align: center; margin-top: 50px; font-family: 'Gill Sans', sans-serif;color: #0d6efd;">
+                    <b>PlayDate</b>
+                </h5>
+            </a>
+        </div>
+        <div class="card mx-auto my-2" style="padding-top: 5vh; border: solid blue; width: 30%">
+            <h6 class="card-subtitle mb-2 mx-4 text-muted">Log-In:</h6><br>
+            <form class="login mx-auto" method="POST" action="">
+                {% csrf_token %}
+                <label for="username" class="mx-4">
+                    <b>Username</b><br>
+                    <input type="text" id="username" name="username" size="30" maxlength="100"><br><br>
+                </label><br>
+                <label class="mx-4">
+                    <b>Password</b><br>
+                    <input type="password" name="password" size="30" maxlength="100"><br>
+                </label><br><br>
+
+                <div class="col mx-4">
+                    <button class="btn btn-primary pt-2" type="submit">
+                        Log In
+                    </button>
+                    <!--<a href="/resetPassword" >Forgot password?</a>-->
+                </div><br>
+                <div>
+                    <p class="mx-4">By continuing, you agree to PlayDate's <a href="/termsofuse">Terms of
+                            Use</a>
+                        and <a href="/privacy">Privacy Notice</a>.
+                    </p>
+                </div><br>
+                <div class="text-center">
+                    <p>Not a member? <a href="/register">Sign Up</a></p>
+                </div><br><br><br>
+            </form>
+        </div>
+    </div>
+    {% include "notificationModal.html" %}
+
+    {% include "footer.html" %}
+</body>
+
+</html>

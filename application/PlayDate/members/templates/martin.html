@@ -1,0 +1,27 @@
+{% load static %}
+{% include "header.html" %}
+
+<body>
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% load static %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% load static %}
+    {% include "general_navbar.html" %}
+    {% endif %}
+    {% endblock %}
+    <br><br><br>
+
+    <div class="wrapper grid text-center">
+        {% load static %}
+        <img src="{% static 'media/img_martin.jpeg' %}" width="380" height="500" alt="martin" /><br><br>
+        <p>Hello my name is Martin Salvatierra.I am a veteran at SFSU trying to get my computer science degree. I have
+            two
+            beautiful german shepherds named Lobo and Yuki.
+            I like to swim and watch Rom Coms with my wife. </p>
+    </div>
+    {% include "footer.html" %}
+</body>
+
+</html>

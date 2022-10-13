@@ -1,0 +1,185 @@
+<!--
+
+░█░█░▀█▀░█▀▀░█░█░░░█▀▀░█▀▄░█▀█░█░█░█▀█░░░█▀█░█▀█░█▀▀░▀█▀
+░▀▄▀░░█░░█▀▀░█▄█░░░█░█░█▀▄░█░█░█░█░█▀▀░░░█▀▀░█░█░▀▀█░░█░
+░░▀░░▀▀▀░▀▀▀░▀░▀░░░▀▀▀░▀░▀░▀▀▀░▀▀▀░▀░░░░░▀░░░▀▀▀░▀▀▀░░▀░
+
+Contributor(s): AndrewC, 
+Version: 1.8.3
+Documentation page: http://bedev.playdate.surge.sh/docs.html
+Description: This is the view group post page. Ideally it would fused with the groups page, and be dynamic. But for now clicking on a post will redirect to this page,
+where the user can view comments and post comments.
+-->
+
+{% load static %}{% include "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Group View Testing</title>
+    </head>
+
+    <body style="background-color: #7ecae6">
+        <!--🐱Navbar Content🐱-->
+        {% block content %} {% if user.is_authenticated %} {% load static %} {% include "registered_navbar.html" %} {%else%} {% load static %} {% include "general_navbar.html" %} {% endif %} {% endblock %} <br />
+
+        <div class="wrapper mt-4">
+            <div class="row">
+                <div class="col-lg-4" style="margin-left: 8vw">
+                    <div class="card">
+                        <div class="card-header">Group Image</div>
+                        <div class="card-body">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                {% if group.banner.url != None %}
+                                <img src="{{group.banner.url}}" style="width: 20vw; height: 20vh" alt="" />
+                                {% else %}
+                                <img src="/media/publicevents_banner/default.jpeg" style="width: 20vw; height: 20vh" alt="" />
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Group Info</div>
+                        <div class="card-body">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                <span class="groupName" style="text-align: center"> <b>Group name: </b>{{group.group_name}}</span>
+                                <span class="groupName" style="text-align: center"> <b>Group Admin: </b> {{group.group_admin}}</span>
+
+                                <p style="text-align: center"><b>Group size:</b> {{member_list|length}} people</p>
+                                <span class="groupName" style="text-align: center"><b>Created on: </b>{{group.create_date}} </span>
+                                <p style="text-align: center"><b>Keywords: </b><i>{% if group.tags.all %} {% for tag in group.tags.all %} {{tag}} {% endfor %} {% else %} No Keywords {%endif %}</i></p>
+                                {% if user.is_authenticated and isMember == False %} {% if regUser %} {% else %}
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Join Group</button><br />
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="staticBackdropLabel">You're not Verified!</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Sorry, it seems you're not verified yet!<br />
+                                                Please go to your <a href="/profile">Profile</a> to upload your identification photo for verification!
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% endif %} {% endif %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <span style="display: flex; justify-content: space-between">
+                                        {% if isMember == True %}
+                                        <button name="mainPage" class="list-group-item list-group-item-action py-2 ripple bg-light" aria-current="true" type="submit">Group Home</button>
+                                        <button name="newGroupEvent" class="list-group-item list-group-item-action py-2 ripple bg-light" aria-current="true" type="submit">New Event</button>
+                                        <button name="newPost" class="list-group-item list-group-item-action py-2 ripple bg-light" aria-current="true" type="submit">New Post</button>
+                                        {% if request.user == group.group_admin%}
+                                        <button name="leaveGroupAdmin" class="list-group-item list-group-item-action py-2 ripple bg-light" aria-current="true" type="submit">Disband Group</button>
+                                        {% elif isMember == True and request.user != group.group_admin %}
+                                        <button name="leaveGroup" class="list-group-item list-group-item-action py-2 ripple bg-light" aria-current="true" type="submit">Leave Group</button>
+                                        {% endif %} {% elif isMember == False %}
+                                        <button name="joinGroup" class="list-group-item list-group-item-action py-2 ripple bg-light" aria-current="true" type="submit">Join Group</button>
+                                        {% endif %}
+                                    </span>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Group Description</div>
+                        <div class="card-body">
+                            <p style="text-align: center">{{group.group_desc}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between" class="bg-light">
+                            <span class="mx-4">Group Post</span>
+                            <button style="text-align: right" class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGroupPost" aria-expanded="true" aria-controls="collapseExample">
+                                {% load static %}
+                                <img src="{% static 'media/enlarge.png' %}" width="25" height="25" alt="martin" />
+                            </button>
+                        </div>
+
+                        <div class="collapse.show card-body" id="collapseGroupPost">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                {% if groupPosts %} {% for post in groupPosts %}
+                                <div class="row">
+                                    <div class="col card" style="width: 50%">
+                                        {% if post.banner.url != None %}
+                                        <img src="{{post.banner.url}}" class="card-img-top" />
+                                        {% else %}
+                                        <img src="/media/publicevents_banner/default.jpeg" class="card-img-top" />
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <!-- Administrative Task Dropdown -->
+                                            <div class="dropdown" style="margin-left: 95%">
+                                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                                    <form method="POST">
+                                                        {% csrf_token %} {% if group.group_admin == user or post.user == user %}
+
+                                                        <button name="editPost" class="dropdown-item" type="submit">Edit</button>
+                                                        <button name="deletePost" class="dropdown-item" type="submit">Delete</button>
+                                                        {% endif %}
+                                                        <button name="reportPost" class="dropdown-item" type="button">Report Content</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <!--Admin task end -->
+                                            <div class="d-flex flex-row align-items-center">{% include "groups/userlink_template.html" %}</div>
+                                            <h5 class="card-title" style="text-align: left"><strong>Post Title:{{post.post_title}}</strong></h5>
+                                            <p class="card-text" style="text-align: left">Description:{{post.post_content}}</p>
+                                            <p style="text-align: left">Created On: {{post.created_on}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                {% endfor %} {% endif %}
+                            </div>
+                            <div class="comments" style="width: 100%">
+                                {% if groupPostComments %} {% for comment in groupPostComments %}
+                                <div class="d-flex flex-row mb-2">
+                                    {% for profile in profiles %} {% if profile.profileID == comment.user %} {% if profile.avatar.url != None %}
+                                    <img src="{{profile.avatar.url}}" style="width: 3rem; height: 3rem; border: 1px solid blue" class="rounded-circle" />
+                                    {% else %}
+                                    <img src="/media/default_user.png" width="50" style="border: solid blue; margin-right: 10%" class="rounded-circle" />
+                                    {% endif %}
+
+                                    <div class="d-flex flex-column ml-2" style="display: inline-block; overflow: hidden">
+                                        <a href="{% url 'profileView' profile_id=comment.user.id %}"> {% if profile.is_verified == True %} ✅ {% else %} ✘ {% endif %} {{comment.user}} </a>
+                                        <small style="line-height: 80%">•{{comment.created_on}}•</small>
+                                        <hr />
+                                        <small class="comment-text" style="">{{comment.content}}</small>
+                                    </div>
+                                    {% endif %} {% endfor %}
+                                </div>
+
+                                <hr />
+                                {% endfor %} {% endif %}
+                                <div class="comment-input">
+                                    <div class="fonts"><i class="fa fa-camera"></i></div>
+                                    <form method="POST" style="padding-left: 3%; margin-right: 35%">
+                                        {% csrf_token %} {{createGroupCommentForm.content}}
+                                        <button name="postComment" style="" class="btn btn-primary pt-2">Comment</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include "footer.html" %}
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </body>
+</html>

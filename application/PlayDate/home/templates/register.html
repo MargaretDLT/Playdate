@@ -1,0 +1,56 @@
+{% extends 'nonNavPage.html' %}
+{% with title="Register" style='static/css/register.css' script='static/js/register.js' %}
+{% block width %}30rem{% endblock %}
+{% block content %}
+            <h6 class="card-subtitle mb-2 text-muted">Sign-Up:</h6>
+            <form class="register" style="width: 450px;" method="POST" action="">
+                {% csrf_token %}
+                <label for="username">
+                    <b>{{user_form.username.label}}</b><br>
+                    {{user_form.username}}
+                    {{ error.username }}<br>
+                </label><br>
+                <label for="name">
+                    <b>{{user_form.first_name.label}}</b><br>
+                    {{user_form.first_name}}<br>
+                    <b>{{user_form.last_name.label}}</b><br>
+                    {{user_form.last_name}}<br>
+                </label><br>
+                <label for="email">
+                    <b>{{user_form.email.label}}</b><br>
+                    {{user_form.email}}
+                    {{ error.email }}<br>
+                </label><br>
+                <label for="password1">
+                    <b>{{user_form.password1.label}}</b><br>
+                    {{user_form.password1}}
+                    {{ error.password }}<br>
+                </label><br>
+                <label for="password2">
+                    <b>Re-enter Password</b><br>
+                    {{user_form.password2}}<br>
+                </label><br>
+                <label for="gender">
+                    <b>{{accountForm.gender.label}}</b><br>
+                    {{accountForm.gender}}<br>
+                </label><br>
+                <label for="dob">
+                    <b>{{accountForm.dob.label}}</b><br>
+                    {{accountForm.dob}}<br>
+                </label><br><br>
+
+                <div class="col">
+                    <button class="btn btn-primary pt-2" type="submit">
+                        Sign Up
+                    </button>
+                </div><br>
+                <div>
+                    <p>By continuing, you agree to PlayDate's <a href="/termsofuse">Terms of Use</a>
+                        and <a href="/privacy">Privacy Notice</a>.
+                    </p>
+                </div><br>
+                <div class="text-center">
+                    <p>Already a member? <a href="/login">Log In</a></p>
+                </div>
+            </form>
+{% endblock %} {% endwith %}

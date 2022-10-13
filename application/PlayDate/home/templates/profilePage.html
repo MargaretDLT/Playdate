@@ -1,0 +1,433 @@
+{% include "header.html" %}
+{% load static %}{% with defImg='../static/media/system_avatar.jpeg'%}
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Your Profile</title>
+
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    </link>
+    <script src="{% static 'js/profile.js' %}" defer="true"></script>
+</head>
+
+<body style="background-color: #9de2ff;">
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% include "general_navbar.html" %}
+    {% endif %}
+    {% endblock %}
+    <script>
+        // Save the values we receive from the server for javascript functions
+        loadVals = {
+            user: {
+                id: "{{user.id}}",
+                username: "{{user.username}}",
+                email: "{{user.email}}",
+                firstName: "{{user.first_name}}",
+                lastName: "{{user.last_name}}",
+                dateJoined: "{{user.date_joined}}",
+                lastLogin: "{{user.last_login}}"
+            },
+            profile: {
+                id: "{{profile.profileID}}",
+                address: {
+                    id: "{{profile.address.address_id}}",
+                    street: "{{profile.address.street}}",
+                    city: "{{profile.address.city}}",
+                    state: "{{profile.address.state}}",
+                    zipCode: "{{profile.address.zipcode}}",
+                    country: "{{profile.address.country}}"
+                }
+            },
+            account: {
+                dob: new Date("{{account.dob.isoformat}}"),
+                gender: "{{account.gender}}"
+            },
+            dependents: [ {% for dependent in dependents %} {
+                id: "{{dependent.dependent_id}}",
+                type: "{{dependent.type}}",
+                name: "{{dependent.name}}",
+                dob: "{{dependent.dob.isoformat}}",
+                interests: "{{dependent.interests}}"
+            } {% if not forloop.last %}, {% endif %} {% endfor %}
+        ],
+        csrf: { token: '{% csrf_token %}' },
+        dpdtURL: '{% url "dependents" %}',
+        homeURL: '{% url "home" %}'
+        };
+
+/* Avatar control --------------------------------------- */
+// ID of the avatar button
+let avatarBtnId = "avatarButton";
+let classPrimary = "btn-primary";
+let classSecondary = "btn-secondary";
+
+// Element of the avatar button
+let avatarBtn;
+
+// Handler for the file selection input
+// If there was an error, send it to the modal and
+// remove the selection.
+// Also, set the submit button usability to match validity.
+function avatarCtrl(fileStatus) {
+    if (!fileStatus.valid) {
+        setAvatarUpload(false);
+        setModal(fileStatus.error.summary, fileStatus.error.text, "OK");
+        showModal();
+        return false;
+    }
+    setAvatarUpload(true);
+    avatarBtn.click();
+    return true;
+}
+
+function uploadClick(event){
+    if (document.getElementById('id_avatar').files.length == 0){
+        event.preventDefault();
+        document.getElementById('id_avatar').click();
+        return false;
+    }
+    return true;
+}
+
+function setAvatarUpload(isValid) {
+    if (isValid) {
+        avatarBtn.classList.remove(classSecondary);
+        avatarBtn.classList.add(classPrimary);
+        avatarBtn.innerText = "Upload Avatar";
+    } else {
+        avatarBtn.classList.remove(classPrimary);
+        avatarBtn.classList.add(classSecondary);
+        avatarBtn.innerText = "Select Avatar";
+    }
+}
+/* Verification control --------------------------------------- */
+// ID of the verification button
+let verBtnId = "verificationButton";
+
+// Element of the verification button
+let verBtn;
+
+// Handler for the file selection input
+// If there was an error, send it to the modal and
+// remove the selection.
+// Also, set the submit button usability to match validity.
+function btnCtrl(fileStatus) {
+    if (!fileStatus.valid) {
+        verBtn.classList.remove(classPrimary);
+        verBtn.classList.add(classSecondary);
+        verBtn.disabled = true;
+        setModal(fileStatus.error.summary, fileStatus.error.text, "OK");
+        showModal();
+        return false;
+    }
+    verBtn.classList.remove(classSecondary);
+    verBtn.classList.add(classPrimary);
+    verBtn.disabled = false;
+    return true;
+}
+        
+        window.addEventListener("DOMContentLoaded", ()=> {
+            avatarBtn = document.getElementById(avatarBtnId);
+            verBtn = document.getElementById(verBtnId);
+            document.getElementById("inputDOB").valueAsDate = loadVals.account.dob;
+            document.getElementById("inputGender").value = loadVals.account.gender;
+        });
+    </script>
+
+    <div class="container mt-5 pt-2">
+        <div class="main-body">
+            <div class="row gutters-sm">
+                <div class="col-md-4 col-sm-12 mb-3">
+
+                    <!-- ID Card -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                <form class="avatar" name="avatar" enctype="multipart/form-data" method="POST" onsubmit="return uploadClick(event)" action="{% url 'avatarUpload'%}">
+                                    {% csrf_token %}
+                                    {% include 'imageUpload.html' with iuID="0" iuAttribute="avatar" iuValEvent="avatarCtrl" iuDisplayType='image' iuDefaultImage=defImg iuSetImage=profile.avatar iuImageClass="rounded-circle iuImage" %}
+                                    <div class="uploadFooter">
+                                        <button class="btn btn-secondary mt-3" type="Submit" id="avatarButton" >Select Avatar</button>
+                                    </div>
+                                </form>
+                                <div class="mt-3">
+                                    <h4>{{user.username}}</h4>
+                                    <p class="text-muted font-size-sm">User since {{user.date_joined}}<br>Last logged in on {{user.last_login}}</p>
+                                </div>
+                                <a href={% url 'accountSettings' user_id=request.user.id %} name="accountSettings" class="btn btn-primary pt-2">Account Settings</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END: ID Card -->
+
+                    <!-- Verification -->
+                    <div class="card">
+                        <div class="card-header">Verification</div>
+                        <div class="card-body">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                {% if profile.is_verified %}
+
+                                <!-- Profile is verified -->
+                                <div class="">
+                                    <h4>Verified</h4>
+                                    <p class="m-auto"></p>Verified on {{ profile.date_verified|date:'D, M d Y' }}</p>
+                                </div>
+
+                                {% else %}
+                                {% if profile.verification %}
+
+                                <!-- Profile unverified, but verification submitted -->
+                                <div class="m-auto">
+                                    <h4>Awaiting approval.</h4>
+                                    <p class="m-auto">Verification documentation has been submitted.</p>
+                                </div>
+
+                                {% else %}
+
+                                <!-- Profile unverified, need upload -->
+                                <h4>Unverified User</h4>
+                                <p>By verifying, users gain access to Groups, Events, and other exciting functionality.</p>
+                                <p>To verify, you simply submit a verification image. If the verification image is accurate, you will become a verified user within 24 hours!</p>
+                                <p>Your verification image should be a close-up picture of your photo id. Please provide us the image in PNG or JPEG format, no bigger than 6.25 Mb.</p>
+                                <br>
+                                <form class="verification" name="verification" enctype="multipart/form-data" method="POST" action="{% url 'verificationUpload'%}">
+                                    {% csrf_token %}
+                                    {% include 'imageUpload.html' with iuID="1" iuAttribute="verification" iuValEvent="btnCtrl" iuDisplayType="plain" iuButtonText="Select Verification" %}
+                                    <button class="btn btn-secondary mt-3" type="Submit" id="verificationButton" disabled>Upload Verification</button>
+                                </form>
+
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END: ID Card -->
+
+                </div>
+                <div class="col-md-8 col-sm-12">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-xl-8">
+
+                                    <!-- Account details card-->
+                                    <div class="card mb-4">
+                                        <div class="card-header">Account Details</div>
+                                        <div class="card-body">
+                                            <form class="accountDetails" name="accountDetails" method="POST" action="/profile/">
+                                                {% csrf_token %}
+
+                                                <!-- AD: Username -->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Username -->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputUserName">Username</label>
+                                                        <input class="form-control" id="inputUserName" type="text"
+                                                            name="inputUserName" placeholder="Edit your username"
+                                                            value="{{user.username}}">
+                                                    </div>
+                                                </div>
+
+                                                <!-- AD: Name -->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Name: First -->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputFirstName">First
+                                                            name</label>
+                                                        <input class="form-control" id="inputFirstName" type="text"
+                                                            name="inputFirstName" placeholder="Enter your first name"
+                                                            value="{{user.first_name}}">
+                                                    </div>
+                                                    <!-- Name: Last -->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputLastName">Last name</label>
+                                                        <input class="form-control" id="inputLastName" type="text"
+                                                            name="inputLastName" placeholder="Enter your last name"
+                                                            value="{{user.last_name}}">
+                                                    </div>
+                                                </div>
+
+                                                <!-- AD: Account -->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Account: gender -->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputGender">Gender</label>
+                                                        <select class="form-select" id="inputGender" 
+                                                            name="inputGender" value="{{account.gender}}">
+                                                            <option value="MALE">Male</option>
+                                                            <option value="FEMALE">Female</option>
+                                                            <option value="NON_BINARY">Non-Binary</option>
+                                                        </select>
+                                                    </div>
+                                                    <!-- Account: date of birth -->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputDOB">Date of Birth</label>
+                                                        <input class="form-control" id="inputDOB" type="date"
+                                                            name="inputDOB" placeholder="Enter your last name"
+                                                            value="{{account.dob}}">
+                                                    </div>
+                                                </div>
+
+                                                <!-- AD: Email Address -->
+                                                <div class="mb-3">
+                                                    <label class="small mb-1" for="inputEmail">Email address</label>
+                                                    <input class="form-control" id="inputEmail" type="email"
+                                                        name="inputEmail" placeholder="Enter your email address"
+                                                        value="{{user.email}}">
+                                                </div>
+
+                                                <!-- AD: Address -->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Address: Street -->
+                                                    <div class="col-md-10">
+                                                        <label class="small mb-1" for="inputStreet">Street</label>
+                                                        <input class="form-control" id="inputStreet" type="text"
+                                                            name="inputStreet" placeholder="e.g. '1600 Calloway Ave' or 'N/A' "
+                                                            value="{{profile.address.street}}" required>
+                                                    </div>
+                                                    <!-- Address: City -->
+                                                    <div class="col-md-10">
+                                                        <label class="small mb-1" for="inputCity">City</label>
+                                                        <input class="form-control w-50" id="inputCity" type="text"
+                                                            name="inputCity" placeholder="e.g. 'San Francisco'"
+                                                            value="{{profile.address.city}}" required>
+                                                    </div>
+                                                    <!-- Address: State -->
+                                                    <div class="col-md-5 mb-1">
+                                                        <label class="small mb-1 w-50" for="inputState">State</label>
+                                                        <select id="inputState" name="inputState"
+                                                            value="{{profile.address.state}}" required>
+                                                            <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AS">American Samoa</option>
+                                                            <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="UM-81">Baker Island</option>
+                                                            <option value="CA">California</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option>
+                                                            <option value="DE">Delaware</option> <option value="DC">District of Columbia</option> <option value="FL">Florida</option>
+                                                            <option value="GA">Georgia</option> <option value="GU">Guam</option> <option value="HI">Hawaii</option>
+                                                            <option value="UM-84">Howland Island</option> <option value="ID">Idaho</option> <option value="IL">Illinois</option>
+                                                            <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="UM-86">Jarvis Island</option>
+                                                            <option value="UM-67">Johnston Atoll</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option>
+                                                            <option value="UM-89">Kingman Reef</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option>
+                                                            <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option>
+                                                            <option value="UM-71">Midway Atoll</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option>
+                                                            <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="UM-76">Navassa Island</option>
+                                                            <option value="NE">Nebraska</option> <option value="NV">Nevada</option> <option value="NH">New Hampshire</option>
+                                                            <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NY">New York</option>
+                                                            <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="MP">Northern Mariana Islands</option>
+                                                            <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option>
+                                                            <option value="UM-95">Palmyra Atoll</option> <option value="PA">Pennsylvania</option> <option value="PR">Puerto Rico</option>
+                                                            <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option>
+                                                            <option value="TN">Tennessee</option> <option value="TX">Texas</option> <option value="UM">United States Minor Outlying Islands</option>
+                                                            <option value="VI">United States Virgin Islands</option> <option value="UT">Utah</option> <option value="VT">Vermont</option>
+                                                            <option value="VA">Virginia</option> <option value="UM-79">Wake Island</option> <option value="WA">Washington</option>
+                                                            <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
+                                                        </select>
+                                                    </div>
+                                                    <!-- Address: Zipcode-->
+                                                    <div class="col-md-10">
+                                                        <label class="small mb-1" for="inputZipCode">Zip Code</label>
+                                                        <input class="form-control w-25" id="inputZipCode" type="text"
+                                                            name="inputZipCode" placeholder="e.g. '95001'"
+                                                            value="{{profile.address.zipcode}}" required>
+                                                    </div>
+                                                    <!-- Address: Country-->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputCountry">Country</label>
+                                                        <input class="form-control" id="inputCountry" type="text"
+                                                            name="inputCountry" placeholder="e.g. 'United States'"
+                                                            value="{{profile.address.country|default:'United States'}}" required>
+                                                    </div>
+                                                </div>
+
+                                                <!-- AD: Description -->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Description -->
+                                                    <div class="col-md-10">
+                                                        <label class="small mb-1" for="inputDescription">Description</label>
+                                                        <textarea class="form-control w-100" id="inputDescription" type="text" rows="4"
+                                                            name="inputDescription" placeholder="Tell everyone a little bit about yourself">{{profile.profileDesc|default_if_none:""}}</textarea>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Save changes button-->
+                                                <button class="btn btn-primary" type="submit">Save changes</button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dependents card-->
+                                    <div class="card mb-4">
+                                        <div class="card-header">Dependents</div>
+                                        <div class="card-body" id="dpdtContainer">
+
+                                            <!-- Dependent A -->
+                                            <div class="card mb-3" id="dep1Body">
+                                                <div class="card-header d-flex flex-row justify-content-between">
+                                                    <div>Dependent 1</div>
+                                                    <button class="btn btn-secondary ml-auto mr-3">&times;</button>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="col-md-10">
+                                                        <label class="small mb-1" for="dep1_name">Name</label>
+                                                        <input class="form-control" id="dep1_name" type="text"
+                                                            name="dep1_name" placeholder="Enter your dependents name"
+                                                            value="{{dependent.0.name}}">
+                                                    </div>
+                                                    <div class='col-md-10'>
+                                                        <label class='small mb-1' for='dep1_type'>Type of Dependent</label>
+                                                        <select class='form-select' id='dep1_type' name='dep1_type' value='{{dependent.0.type}}'>
+                                                            <option value='CHILD'>Child</option>
+                                                            <option value='PET'>Pet</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <label class="small mb-1" for="dep1_dob">Date of Birth</label>
+                                                        <input class="form-control" id="dep1_dob" type="date"
+                                                            name="dep1_dob" placeholder="MM/DD/YYYY"
+                                                            value="{{dependent.0.dob}}">
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <label class="small mb-1" for="dep1_interests">Interests</label>
+                                                        <input class="form-control" id="dep1_interests" type="text"
+                                                            name="dep1_interests"
+                                                            placeholder="Enter your dependents interests"
+                                                            value="{{dependent.0.interests}}">
+                                                    </div>
+                                                    <div class="col-md-10 mt-3 mr-0 ml-auto">
+                                                        <button class="btn btn-primary">Save</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- END: Dependent A -->
+
+                                            <!-- Dependent Footer -->
+                                            <div class="row-md-12 d-flex flex-row-reverse justify-content-between">
+                                                <div class="">
+                                                    <button class="btn btn-secondary">Add Dependent</button>
+                                                </div>
+                                                <div class="ml-0 mr-auto" id="depCount">
+                                                    Dependents: 1
+                                                </div>
+                                            </div>
+                                            <!-- END: Dependent Footer -->
+
+                                        </div>
+                                    </div>
+                                    <!-- END: Dependents Card -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "ajaxRequest.html" %}
+    {% include "notificationModal.html" %}
+    {% include "footer.html" %}
+</body>
+{% endwith %}
+</html>

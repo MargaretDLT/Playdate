@@ -1,0 +1,141 @@
+{% comment %}
+// tagList.html
+//  This template includes the html and the js to include a 
+//  a tag list. The way this works is there is a hidden text
+//  field which holds the current list of tags as a comma 
+//  comma separated list. We have a div which gets filled
+//  dynamically by the individual tags of the string. 
+//
+//  In the code, the hidden text is termed the 'source' and 
+// the dynamic list is the 'ledger'. The source has a class
+// of 'tlSource' and the ledger's is 'tlLedger'.
+//
+// When using this template, you should emulate the following:
+// {% include 'tagList.html' with 
+//      tlId=1 
+//      tlAttribute="tags" 
+//      tlContent="bears,browns,chicago,cleveland,house,party,house_party,nachos,tacos,burritos,pizza,spaghetti,rupert,murdock,burgers_for_the_poor_sports_for_the_fools_comics_for_the_nerds,spinach,lettuce,tomato,onion,patty,wagyu,beef"  %}
+// NOTE: this is presented on multiple lines for readability. When using it,
+//  you will need to compress the include tag to a single line.
+//
+// tlID:--------------------------------------------------------------------
+//  An identifier to separate multiple tagList includes in the same file
+//
+// tlAttribute:-------------------------------------------------------------
+//  The name of the attribute of the form that relates to this tagList.
+//  For example, if you have a model named Group that has an attribute 
+//  'tags', tlAttribute would be 'tags'.
+//
+// tlContent:-------------------------------------------------------OPTIONAL
+// The string of tags to populate the list with. If this gets changed, the
+//  the entire list should be changed.
+{% endcomment %}
+
+<style>
+    .tag {
+        padding: 5px;
+        border: 1px solid #ccc;
+        margin: 5px;
+        display: flex;
+        align-items: center;
+        border-radius: 3px;
+        background: #f2f2f2;
+        width: fit-content;
+    }
+    .tagText {
+        padding: 5px;
+    }
+    .tagClose {
+
+    }
+    .tlLedger {
+
+    }
+</style>
+
+<script>
+    // Server Input
+    const tlId = "{{tlId}}";
+    const tlAttribute = "{{tlAttribute}}";
+    const tlContent = "{{tlContent}}";
+
+    // Elements
+    var tlSource_{{tlId}};
+    var tlLedger_{{tlId}};
+
+    // Initialize the variables we need
+    function initTagList_{{tlId}}(){
+        tlSource_{{tlId}} = document.getElementById("id_{{tlAttribute}}");
+        tlLedger_{{tlId}} = document.getElementById("tlLedger_{{tlId}}");
+        tlSource_{{tlId}}.addEventListener("change", populateLedger_{{tlId}});
+        populateLedger_{{tlId}}();
+    }
+
+    // Adds a tag to the source and updates the ledger
+    function addTag_{{tlId}}(tag){
+        let tagString = tlSource_{{tlId}}.value;
+        let tagArray = [];
+        if (tagString != "") {
+            tagArray = tagString.split(",");
+        }
+        tagArray.push(tag);
+        setTagList_{{tlId}}(tagArray);
+    }
+
+    // Fetches the current tag list 
+    function getTagList_{{tlId}}(){
+        let tagString = tlSource_{{tlId}}.value;
+        return tagString.split(",");
+    }
+
+    // Sets the Source and updates the ledger
+    function setTagList_{{tlId}}(tagArray){
+        if (tagArray.length == 0) {
+            tlSource_{{tlId}}.value = "";
+        } else {
+            let tagString = "";
+            for (let tagIndex = 0; tagIndex < tagArray.length; tagIndex++){
+                if (tagIndex > 0) {
+                    tagString = tagString + ",";
+                }
+                tagString = tagString + tagArray[tagIndex];
+            }
+            tlSource_{{tlId}}.value = tagString;
+        }
+        populateLedger_{{tlId}}();
+    }
+
+    // Removes a specific tag from the source
+    // then updates the ledger
+    function deleteTag_{{tlId}}(tagId){
+        let tagList = getTagList_{{tlId}}();
+        tagList.splice(tagId, 1);
+        setTagList_{{tlId}}(tagList);
+    }
+
+    // Refreshes the ledger to the current status
+    // of the source
+    function populateLedger_{{tlId}}(){
+        let tagArray = getTagList_{{tlId}}();
+        let tagsHtml = "";
+        if (tagArray[0] != "") {
+            for (let tagIndex = 0; tagIndex < tagArray.length; tagIndex++){
+                let tagHtml = '<div class="tag col-sm-3"><span class="tagText">'
+                    + tagArray[tagIndex]
+                    + '</span><button class="tagClose btn btn-secondary" type="button" onclick="deleteTag_{{tlId}}('
+                    + tagIndex
+                    + ')">&times;</button></div>';
+                tagsHtml = tagsHtml + tagHtml;
+            }
+        }
+        tlLedger_{{tlId}}.innerHTML = tagsHtml;
+    }
+    
+    window.addEventListener('DOMContentLoaded', initTagList_{{tlId}});
+</script>
+<div class="container">
+    <input id="id_{{tlAttribute}}" class="tlSource" name="{{tlAttribute}}" type="text" value="{% if tlContent %}{{tlContent}}{% endif %}" hidden>
+    <div id="tlLedger_{{tlId}}" class="tlLedger row"></div>
+</div>
+
+

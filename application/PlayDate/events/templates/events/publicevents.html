@@ -1,0 +1,100 @@
+{% include "header.html" %}
+<!-- #marty -->
+
+<body style="background-color: #9de2ff;">
+
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% load static %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% load static %}
+    {% include "general_navbar.html" %}
+    {% endif%}
+    {% endblock %}
+    <div class="wrapper">
+        <h5 style="margin-left: 10%;"><b>Public activities for everyone:</b></h5>
+
+        <!-- <div class="section-title">
+            <p>Fun activities  for you kids and pets.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 d-flex justify-content-center">
+                <ul id="portfolio-flters">
+                    <li data-filter="*" class="filter-active">All</li>
+                    <li data-filter=".filter-card">Kids</li>
+                    <li data-filter=".filter-web">Pets</li>
+                </ul>
+            </div>
+        </div> -->
+
+        <div class="grid-container">
+            {% for event in publicevents %}
+            <div class="col card mx-2 my-2" style="border-radius: 15px; width: 24rem;">
+                <img src={{event.banner.url}} style="width: 22rem; height: 30vh" class="card-img-top  mt-2" alt="...">
+                <div class="card-body">
+                    <p class="card-text">
+                        <!-- <a href="/events/publicEvent1">{{event.name}}</a></p> -->
+                    <h5 id="descText">{{event.name}}</h5>
+                    <!-- <a href="/events/publicEvent1" class="btn btn-primary">View details</a> -->
+                    <div>
+                        <p id="descText" class="text-center px-5">{{event.desc}}</p>
+                    </div>
+                    <!-- <div>
+                        <p>Location:</p>
+                        <p>{{event.address.street}}<br> {{event.address.city}} <br>{{event.address.state}} -
+                            {{event.address.zipcode}}</p>
+                    </div> -->
+
+                </div>
+                <div class="card-body">
+                    <a href="/events/publicEvent1" class="btn btn-primary">View details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% include "footer.html"%}
+</body>
+
+</html>
+<style>
+    @media (min-width: 900px) {
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            align-items: center;
+
+            max-width: 1000px;
+            margin: auto;
+            display: grid;
+        }
+
+    }
+
+    @media (max-width: 900px) {
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media only screen and (max-width: 600px) {
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+
+    .card-body {}
+
+    #descText {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+    }
+</style>

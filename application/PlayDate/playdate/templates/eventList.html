@@ -1,0 +1,97 @@
+<!-- Template: eventList.html -->
+<table class="table">
+    <thead>
+        <tr>
+            <th class="text-center" scope="col">Date </th>
+            <th scope="col">Event</th>
+            <th scope="col">Description</th>
+            <th scope="col">Location</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if registered_events %}
+        {% for item in registered_events %}
+        <tr class="inner-box">
+            <th scope="row">
+                <div class="event-date">
+                    {% if item.event.datetime != None %}
+                    <p>{{item.event.datetime}}</p>
+                    {% endif %}
+                </div>
+            </th>
+            <td>
+                {% if item.event.banner.url != None %}
+                <div class="event-img">
+                    <img src={{item.event.banner.url}} style="width: 25vw; height: 30vh" class="card-img-top  mt-2"
+                        alt="...">
+                </div>
+                {% else %}
+                <div class="event-img">
+                    <img src="/media/publicevents_banner/default.jpeg" style="width: 25vw; height: 30vh"
+                        class="card-img-top  mt-2" alt="...">
+                </div>
+                {% endif %}
+            </td>
+            <td style="width: 25%;">
+                <div class="event-wrap">
+                    <span>
+                        {% if item.event.name != None%}
+                        <a href="/events/{{item.event.event_id}}">{{item.event.name}}</a>
+                        {% endif %}
+
+                    </span><br><br>
+                    <div class="meta">
+                        <div class="organizers">
+                            <b>Posted By:</b> {{item.event.user.first_name}}<br><br>
+                        </div>
+                        <!-- <div class="time">
+                                <span><b>Time:</b> 10:00 AM</span><br><br>
+                            </div> -->
+                        <div class="category">
+                            {% if item.event.user != user%}
+                            <span><b>Category:</b> RSVP'd Events</span><br><br>
+                            {% else %}
+                            <span><b>Category:</b> Created by You</span><br><br>
+                            <div class="row">
+                                <a href="/events/edit/{{item.event.event_id}}"
+                                    class="col mx-auto btn btn-primary">Edit</a>
+                                <form method="POST" action="/events/delete/{{item.event.event_id}}/"
+                                    class="col mx-auto">
+                                    {% csrf_token %}
+                                    <button name="delete" class="btn btn-primary" type="submit">Delete</button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="location">
+                    {% if item.event.address.street != None%}
+                    {{item.event.address.street}}
+                    {% endif %} <br>{{item.event.address.city}}<br>
+                    {{item.event.address.state}}<br> {{item.event.address.country}}-
+                    {{item.event.address.zipcode}}
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+
+        {% else %}
+        <tr class="inner-box">
+            <td></td>
+            <td>
+                <p> You have not signed up for any event</p>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        {% endif %}
+
+    </tbody>
+
+</table>

@@ -1,0 +1,26 @@
+<!--group events-->
+{% if groupEvents %} {% for profile in profiles %} {% if profile.profileID == event.user %} {% if profile.avatar.url != None %}
+<img src="{{profile.avatar.url}}" width="50" class="rounded-circle" />
+{% else %}
+<img src="/media/default_user.png" width="50" style="border: solid blue; margin-right: 10%" class="rounded-circle" />
+{% endif %}
+<div class="d-flex flex-column ml-2">
+    <span class="font-weight-bold">
+        <a href="{% url 'profileView' profile_id=event.user.id %}"> {% if profile.is_verified == True %} ✅ {% else %} ✘ {% endif %} {{event.user}} </a>
+    </span>
+    <small class="text-primary">{{event.address}}</small>
+</div>
+{% endif %} {% endfor %} {% endif %}
+
+<!--group posts-->
+{% if groupPosts %} {% for profile in profiles %} {% if profile.profileID == post.user %} {% if profile.avatar.url != None %}
+<img src="{{profile.avatar.url}}" width="50" class="rounded-circle" />
+{% else %}
+<img src="/media/default_user.png" width="50" style="border: solid blue; margin-right: 10%" class="rounded-circle" />
+{% endif %}
+<div class="d-flex flex-column ml-2">
+    <span class="font-weight-bold">
+        <a href="{% url 'profileView' profile_id=post.user.id %}"> {% if profile.is_verified == True %} ✅ {% else %} ✘ {% endif %} {{post.user}} </a>
+    </span>
+</div>
+{% endif %} {% endfor %} {% endif %}

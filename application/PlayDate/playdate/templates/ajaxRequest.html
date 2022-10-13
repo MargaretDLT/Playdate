@@ -1,0 +1,27 @@
+<!-- ajaxRequest.html
+This template provides ajax capabilities. Once included, the 
+javascript simply needs to compile a dictionary of the data 
+to send to the server, the url to send to, and a callback 
+function. The callback function will take the response.status
+and the return values as a dictionary.
+
+            callback = function(responseData, responseStatus){}
+            sendAjax(requestData, requestURL, callback);
+
+-->
+<script>
+    let csrfValue = "{{csrf_token}}";
+    function sendAjax(dataDictionary, url, callback){
+        var compiledData = JSON.stringify(dataDictionary);
+        var request = new XMLHttpRequest();
+        request.onload = function(response) {
+            let responseData = JSON.parse(response.target.response);
+            let responseStatus = response.target.status;
+            callback(responseData, responseStatus);
+        }
+        request.open("POST", url, true);
+        request.setRequestHeader('X-CSRFToken', csrfValue);
+        request.setRequestHeader('CONTENT_TYPE', 'application/json');
+        request.send(compiledData);
+    }
+</script>

@@ -1,0 +1,56 @@
+{% load static %}{% include "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Create Group</title>
+    </head>
+
+    <!--Why are there two <body>'s and 4 load static tags? Whoever wrote this just pasted their code at the end, this file needs cleanup-->
+
+    <!--
+<body style="background-color: #9de2ff;">
+    <br />
+    <br />
+    <br />
+    <form method="POST">
+    </form>
+</body> -->
+    <body style="background-color: #9de2ff">
+        {% if user.is_authenticated %} {% load static %} {% include "registered_navbar.html" %} {% else %} {% load static %} {% include "general_navbar.html" %} {% endif %}
+        <br />
+        <br />
+
+        <!--This h4 tag becomes covered by the navbar and does not show.
+        <h4 class="logo navbar-brand text-center">
+            <b>Create Your Group:</b>
+        </h4>
+        -->
+
+        <!--FIX-THIS: The top border is cut-off by the navbar-->
+        <div class="card mx-auto my-3" style="padding-top: 5vh; border: solid blue; height: 90vh; width: 70vw">
+            {% if not user.is_authenticated %}
+            <div class="card-body">
+                <h1 style="text-align: center">You need to be logged in and verified to do group activities!</h1>
+                <h4 style="text-align: center"><a href="/register/">🐱Register here!</a>•Already registered?•<a href="/login/">Login Here!🐱</a></h4>
+            </div>
+            {% elif user.is_authenticated and regUser.is_verified != True%}
+            <div class="card-body">
+                <h1 style="text-align: center">You need to be verified to do group activities!</h1>
+                <h4 style="text-align: center"><a href="/profile/">🐱Upload Verification Here!</a><br />•Already Uploaded?• Wait for an admin to verify your account!🐱</h4>
+            </div>
+            {% endif %}
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+
+        <footer class="gsfooter mt-auto bg-light py-1 d-none d-md-flex fixed-bottom">
+            <div class="container-fluid text-center text-md-left">
+                <span class="text-dark"> <a href="/termsofuse">Terms of Use | </a><a href="/privacy">Privacy Notice | </a><a href="/helpPage">Contact Us</a><br /> </span>
+                <span class="text-dark">Copyright © 2022 TheBabySitters. All rights reserved.</span>
+            </div>
+        </footer>
+    </body>
+</html>

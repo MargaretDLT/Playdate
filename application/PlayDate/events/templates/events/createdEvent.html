@@ -1,0 +1,306 @@
+{% load static %}
+{% include "header.html" %}
+{% include "registered_navbar.html" %}
+
+<style>
+body{
+  margin-top:20px;
+  background:#eee;
+
+}
+.profile-widget {
+  position: relative;
+}
+.profile-widget .image-container {
+  background-size: cover;
+  background-position: center;
+  padding: 190px 0 10px;
+}
+.profile-widget .image-container .profile-background {
+  width: 100%;
+  height: auto;
+}
+.profile-widget .image-container .avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin: 0 auto -60px;
+  display: block;
+}
+.profile-widget .details {
+  padding: 50px 15px 15px;
+  text-align: center;
+}
+.tag{
+  padding-bottom: 10px;
+}
+.groupMembers{
+  color: black;
+  padding-right: 10px;
+}
+img.profile-photo-lg{
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+}
+div.scroll {
+  margin: 4px, 4px;
+  padding-left: 1.5rem;
+  padding-top: 1rem;
+  width: 35%;
+  height: 30rem;
+  overflow-x: auto;
+  overflow-y: auto;
+  text-align:justify;
+  background-color: rgb(160, 215, 229);
+  margin-left: 33%;
+  position: relative;
+  margin-bottom: 2%;
+}
+.name{
+  position: relative;
+  bottom: 60px;
+  left: 90px;
+}
+.members{
+  padding-top: 10px;
+  padding-left: 5px;
+}
+.groupEvents{
+  padding-left: 10px;
+  padding-top: 5px;
+}
+.groupMembers{
+  margin-left: 24%;
+  position: relative;
+  bottom: 6px;
+}
+.des{
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 500px;
+  height: 100px;
+  word-wrap: break-word;
+  padding-left: 34%;
+}
+.image-container{
+  width: 150%;
+  padding-right: 200px;
+  padding-left: 100px;
+  
+}
+</style>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <div class="panel panel-white profile-widget">
+            <div class="row">
+                <div class="col-sm-12">
+                    {% if event.banner.url != None %}
+                    <div class="image-container bg2" style="background-color:green;">
+                        <img src={{event.banner.url}} class="avatar" alt="avatar">
+                    </div>
+                    {% else %}
+                    <div class="image-container bg2" style="background-color:green;">
+                        <img style= "width: 14rem; height: 14rem;" src="/media/publicevents_banner/default.jpeg" class="avatar" alt="avatar">
+                    </div>
+                    {% endif %}
+                </div>
+                <div style="margin-left: 24%; margin-top: 2%;" class="col-sm-12">
+                    <div class="details">
+                        <h4>{{event.name}}<i class="fa fa-sheild"></i></h4>
+                        <div style="font-weight: bold;">Created by:  
+                          <a href="{% url 'profileView' profile_id=user.id %}">
+                            {{event.user.first_name}} {{event.user.last_name}}
+                          </a>
+                        </div>
+                        
+                        <div style="margin-right: 20%; font-weight: bold;">Description: </div>
+                        <div class="des">{{event.desc}}</div>
+                        <h5 style="padding-right: 11rem;">Location:</h5>
+                        <div class="des">
+                        {% if event.address.street %}
+                        {{event.address.street}}
+                        {%endif%}
+                        {% if event.address.city %}
+                        {{event.address.city}}
+                        {%endif%}
+                        {% if event.address.state %}
+                        {{event.address.state}}
+                        {%endif%}
+                        {% if event.address.country %}
+                        {{event.address.country}}
+                        {%endif%}
+                        {% if event.address.zipcode %}
+                        {{event.address.zipcode}}
+                        {%endif%}
+                      </div>
+                        
+                        
+                        
+                        
+                        
+
+                        <h5 style="padding-right: 6.5rem;">Event Date: {{event.datetime}}</h5>
+                        <!-- <div class="tag">Tags: hiking  hikers</div> -->
+                        <div class="mg-top-10" id="myAttendance">
+                          {% if isRsvp %}
+                          <a id="btnAttendee" class="btn btn-danger"  
+                          onclick="cancelMyRSVP()">Cancel RSVP</a>
+                            
+                          {% else %}
+                          <form method="POST" action="/events/register/{{event.event_id}}/">
+                            {% csrf_token %}
+                            <button name="rsvp" class="btn btn-primary pt-2" type="submit">RSVP</button>
+                          </form>
+                            
+                          {% endif %}
+                         
+
+                        </div>
+                    </div>
+                </div>
+                 
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!-- to do: Seed event attendees from database -->
+<div class="container">
+  <h4 class="groupMembers">Event Attendees:</h4>
+  <div class="scroll">
+      <div class="attendeesContainer">
+        <!-- <div id="me" class="member">
+            <div class="row">
+              <div class="col-md-2 col-sm-2">
+                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="user" class="profile-photo-lg">
+              </div>
+              <div class="name">
+                <h5>You</h5>
+                <p>Cat: Zelda</p>
+                <a id="me" class="btn btn-danger dismiss-notification"  onclick="myFunction(this.id)">Remove attendee</a>                
+              </div>
+            </div>
+          </div> -->
+          {% for attendee in attendees %}
+            <div id="attendee_{{attendee.user.pk}}" class="member">
+              <div class="row">
+                <div class="pic">
+                  <img src="{% if profile.avatar %}{{profile.avatar.url}}{%else%}{% static 'media/system_avatar.jpeg'%}{%endif%}"
+                        alt="User avatar" class="profile-photo-lg">
+                  <!-- <img src={{attendee.user}} alt="user" class="profile-photo-lg"> -->
+                </div>
+                <div class="name">
+                  <h5>{{attendee.user.first_name}}</h5>
+                  {% if attendee.user == user %}
+                  <!-- This attendee is me. -->
+                    {% if event.user == attendee.user or attendee.user == event.group_admin %}
+                    <!-- I am an event admin -->
+                    <!-- Buttons: 'Cancel Event' -->
+
+                    <!-- Not yet ready to implement 
+                    <a id="btnAttendee_{{attendee.user.pk}}" class="btn btn-danger"  
+                        onclick="cancelEvent({{ event.pk }})">Cancel Event</a>
+                    -->
+
+                    {% else %} 
+                    <!-- I am not an event admin-->
+                    <!-- Buttons: 'Cancel RSVP' --> 
+                    <a id="btnAttendee_{{attendee.user.pk}}" class="btn btn-danger"  
+                        onclick="cancelRSVP({{attendee.pk}}, 'btnAttendee_{{attendee.user.pk}}')">Cancel RSVP</a>
+
+                    {% endif %}
+                  {% else %}
+                  <!-- This attendee is another user -->
+                    {% if event.user == user or user == event.group_admin %}
+                    <!-- This attendee is RSVPd for my event -->
+                    <!-- Buttons: 'Remove Attendee' -->
+                    <a id="btnAttendee_{{attendee.user.pk}}" class="btn btn-danger"  
+                        onclick="cancelRSVP({{attendee.pk}}, 'btnAttendee_{{attendee.user.pk}}')">Remove attendee</a>
+
+                    {% else %} 
+                    <!-- This attendee is RSVPd for the event -->
+                    <!-- Buttons: 'View Profile' -->
+                    <a id="btnAttendee_{{attendee.user.pk}}" class="btn btn-secondary" href="/profile/{{attendee.user.pk}}">View Profile</a>
+
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+            
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+    let urls = {
+        home: '{% url "home" %}',
+        erEdit: '{% url "eventRegistrationEdit" %}'
+    };
+    let myRes = "{{isRsvp.pk}}";
+    let rsvp = "{{isRsvp}}";
+    function showNotAttending(btnID) {
+        var btnElement = document.getElementById(btnID);
+        btnElement.innerText = "No Longer Attending";
+        btnElement.classList.remove("btn-danger");
+        btnElement.classList.add("btn-secondary");
+        btnElement.disabled = true;
+    }
+    function removedRSVPCallback(data, status) {
+        if (status == 200) {
+            showNotAttending(data.request.btnID);
+        } else if (status == 500) {
+            setModal("An Error Occurred", "An error occurred on the server. Summary: "+data.error.message, "close");
+            showModal();
+        } else {
+            setModal("Login Timeout", "Unfortunately, your login has timed out. You will now be returned to the home page.", "close");
+            showModal(); 
+            window.location.replace(urls.home);
+        }
+    }
+    function cancelEvent(eventID){
+        setModal("Oops!", "Cancelling an event is not yet implemented. You can still edit the event to let others know what is going on. Good luck!", "close");
+        showModal();
+    }
+    function cancelMyRSVP() {
+        let data = {
+            rsvpID: myRes,
+            operation: "DELETE"
+        }
+        sendAjax(data, urls.erEdit, (data, status)=> {
+            if (status != 200) {
+                setModal("Error", "There was an error when trying to cancel your event RSVP", "Close");
+                showModal();
+            }
+            let btnElemnt = document.getElementById('myAttendance');
+            let btnHtml = '<form method="POST" action="/events/register/{{event.event_id}}/">{% csrf_token %}<button name="rsvp" class="btn btn-primary pt-2" type="submit">RSVP</button></form>';
+            btnElemnt.innerHTML = btnHtml;
+            setModal("Success", "You have successfully canceled your RSVP for {{event.name}}", "Close");
+            showModal();
+
+        });
+
+    }
+    function cancelRSVP(rsvpID, btnID){
+        let data = {
+            rsvpID: rsvpID,
+            operation: "DELETE",
+            btnID: btnID
+        }
+        sendAjax(data, urls.erEdit, removedRSVPCallback);
+    }
+
+</script>
+{%include 'ajaxRequest.html'%}
+{%include 'notificationModal.html'%}

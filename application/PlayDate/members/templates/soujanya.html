@@ -1,0 +1,31 @@
+{% load static %}
+{% include "header.html" %}
+
+<body>
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% load static %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% load static %}
+    {% include "general_navbar.html" %}
+    {% endif %}
+    {% endblock %}
+    <br><br><br>
+
+    <div class="wrapper text-center">
+        {% load static %} <img src="{% static 'media/img_sou.jpeg' %}" width="380" height="500"
+            alt="Soujanya" /><br><br>
+        <p>I am Soujanya Nayak. I live in Fremont with my husband. I did my Bachelors in Computer Science and currently
+            pursuing Masters in Computer Science. I have around 5 years experience as data engineer. But I want to see
+            myself grow as a Software Engineer. I am happy to work with this amazing team. I am learning a lot from all
+            of
+            them.</p>
+        <p>My new found passion in California is travelling and hiking. The above picture was taken at Lake Tahoe. My
+            most
+            favourite hike till date was Mist Trail in Yosemite.</p>
+    </div>
+    {% include "footer.html" %}
+</body>
+
+</html>

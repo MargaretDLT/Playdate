@@ -1,0 +1,213 @@
+{% include "header.html" %}
+{% load static %}
+
+<head>
+    <meta charset="UTF-8" />
+    <title>{{pUser.first_name}}'s Profile</title>
+</head>
+
+<body>
+    {% block content %}
+    {% if user.is_authenticated %}
+    {% include "registered_navbar.html" %}
+    {% else %}
+    {% include "general_navbar.html" %}
+    {% endif %}
+    {% endblock %}
+    <style>
+        body {
+            padding-top: 65px;
+        }
+
+        .dependent {
+            border: 1px solid grey;
+            padding: 0;
+            border-radius: 5px 5px 15% 15%;
+        }
+
+        .event {
+            border: 1px solid grey;
+            padding: 0;
+            border-radius: 5px;
+            width: 40%;
+        }
+
+        .eventImg {
+            height: 60%;
+        }
+
+        .event:hover {
+            background-color: lightblue;
+        }
+    </style>
+
+    <!--
+        User: {{pUser}}
+        Profile: {{profile}}
+        Address: {{address}}
+        Gender: {{account.gender}}
+
+    -->
+
+    <div class="card mt-2 mx-auto" style="border-radius: 15px; width: 50rem;">
+        <div class="card-body p-4">
+            <div class="d-flex text-black">
+                <div class="flex-shrink-0">
+                    {% load static %}
+                    <img src="{% if profile.avatar %}{{profile.avatar.url}}{%else%}{% static 'media/system_avatar.jpeg'%}{%endif%}"
+                        alt="User avatar" class="img-fluid" style="width: 180px; height: 180px; border-radius: 10px;">
+                </div>
+                <div class="flex-grow-1 d-flex flex-column justify-content-between ms-3">
+                    <h5 class="mb-1">{{pUser.first_name}} {{pUser.last_name}}</h5>
+                    <p class="mb-2 pb-1" style="color: #2b2a2a;">
+                        {% if address %}Parent in {{address.city}}, {{address.state}}{% else %}User since
+                        {{pUser.date_joined}}{% endif %}
+                    </p>
+                    <div class="d-flex justify-content-around rounded-3 p-2 mb-2" style="background-color: #efefef;">
+                        <div>
+                            <p class="small text-muted mb-1">Gender</p>
+                            <p class="mb-0">{{account.gender|lower|capfirst}}</p>
+                        </div>
+                        <div>
+                            <p class="small text-muted mb-1">Date of Birth</p>
+                            <p class="mb-0">{{account.dob|date:"F j, o" }}</p>
+                        </div>
+                        <div>
+                            <p class="small text-muted mb-1">Verification</p>
+                            <p class="mb-0">
+                                {% if profile.is_verified %}Verified on {{profile.date_verified|date:"F j, o" }}
+                                {% elif profile.verification %}Awaiting verification
+                                {% else %}Not uploaded{%endif%}
+                            </p>
+                        </div>
+                    </div>
+                    {% if profile.profileDesc %}
+                    <div class="d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
+                        <div>
+                            <p class="small text-muted mb-1">About {{pUser.first_name}}</p>
+                            <p class="mb-0">{{profile.profileDesc}}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- <div class="d-flex pt-1">
+                        <button type="button" class="btn btn-outline-primary me-1 flex-grow-1">Send
+                            Message</button>
+                        <button type="button" class="btn btn-primary flex-grow-1">Add Friend</button>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!------------------------------------------------------------
+    ----------------------- Dependents ---------------------------
+    ------------------------------------------------------------->
+    {% if dependents %} {% if dependents|length > 0 %}
+    <div class="card mt-2 mx-auto" style="border-radius: 15px; width: 50rem;">
+        <div class="row ms-2 mt-2">
+            <h5><b>{{pUser.first_name}}'s Dependents:</b></h5>
+        </div>
+        <div class="row d-flex flex-row justify-content-around">
+            {% for dependent in dependents %}
+            <div class="dependent ms-3 my-2" style="width: 30%;">
+                <!-- <img src="{% static 'media/helen_p1.jpg' %}" width="80px" height="100px" class="card-img-top  mt-2" alt="..."> -->
+                <div class="card-header d-flex flex-row justify-content-between">
+                    <div>{{dependent.name}}</div>
+                    <div>{{dependent.get_gender_display}}</div>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <p class="small text-muted mb-1">Date of Birth</p>
+                        <p class="mb-2">{{dependent.dob|date:"F j, o" }}</p>
+                    </div>
+                    <div>
+                        <p class="small text-muted mb-1">Interests</p>
+                        <p class="mb-2">{{dependent.interests}}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}{% endif %}
+    <!------------------------------------------------------------
+    -------------------- Events ----------------------------------
+    ------------------------------------------------------------->
+    {% comment %}{% include 'eventList.html' with registered_events=regEvents %}{% endcomment %}
+    {% if hasRSVP %} {% if rsvpEvents|length > 0 %}
+    <div class="card mt-2 mx-auto" style="border-radius: 15px; width: 50rem;">
+        <div class="row ms-2 mt-2">
+            <h5><b>{{pUser.first_name}}'s Events:</b></h5>
+        </div>
+        <div class="row d-flex flex-row justify-content-around">
+            {% for event in rsvpEvents %}
+
+
+            <a class="card event my-3 {% if createdEvents %}{%if event in createdEvents %}event_admin{%endif%}{%endif%}" href="/events/{{event.pk}}">
+                <!-- <a class="evntButton" href="/events/{{event.pk}}"> -->
+
+                {% if createdEvents %}{%if event in createdEvents %}
+                <!-- IF the profile is admin of this event -->
+                {%endif%}{%endif%}
+
+                <img class="card-img-top eventImg"
+                    src="{% if event.banner %}{{event.banner.url}}{% else %}{% static 'media/helen_p1.jpg' %}{%endif%}"
+                    alt="...">
+                <!-- <div class="card-header">{{event.name}}</div>  -->
+                <div class="card-body d-flex flex-column justify-content-between align-items-center mt-0 mx-0">
+                    <h4 class="card-title">{{event.name}}</h4>
+                    <p class="h-25">{{event.desc|truncatechars:62}}</p>
+
+                    <div>
+                        <p class="mb-2 small text-muted">{{event.datetime|date:"F j, o"}}</p>
+                    </div>
+                </div>
+                <!-- </a> -->
+            </a>
+
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}{% endif %}
+    
+    <!------------------------------------------------------------
+    ----------------------- Groups -------------------------------
+    ------------------------------------------------------------->
+    {% if membership %} {% if membership|length > 0 %}
+    <div class="card mt-2 mx-auto" style="border-radius: 15px; width: 50rem;">
+        <div class="row ms-2 mt-2">
+            <h5><b>{{pUser.first_name}}'s Groups:</b></h5>
+        </div>
+        <div class="row d-flex flex-row justify-content-around">
+            {% for isof in membership %}
+
+
+            <a class="card event my-3 {% if group.group_admin == pUser %}group_admin{%endif%}" href="/groups/{{isof.group.pk}}">
+                <!-- <a class="evntButton" href="/events/{{event.pk}}"> -->
+
+                    {% if isof.group_id.group_admin == pUser %}
+                <!-- IF the profile is admin of this group -->
+                {%endif%}
+
+                <img class="card-img-top eventImg"
+                    src="{% if isof.group_id.banner %}{{isof.group_id.banner.url}}{% else %}{% static 'media/helen_p1.jpg' %}{%endif%}"
+                    alt="...">
+                <!-- <div class="card-header">{{event.name}}</div>  -->
+                <div class="card-body d-flex flex-column justify-content-between align-items-center mt-0 mx-0">
+                    <h4 class="card-title">{{isof.group_id.group_name}}</h4>
+                    <p class="h-25">{{isof.group_id.group_desc|truncatechars:62}}</p>
+
+                    <div>
+                        <p class="mb-2 small text-muted">{{isof.join_date|date:"F j, o"}}</p>
+                    </div>
+                </div>
+                <!-- </a> -->
+            </a>
+
+            {% endfor %}
+        </div>
+    </div>
+    {%endif%}{%endif%}
+    {% include "footer.html" %}
+</body>
+
+</html>

@@ -1,0 +1,218 @@
+{% load static %}
+{% include "header.html" %}
+
+<style>
+        .uplInput {
+                position: fixed;
+                top: -1000px;
+        }
+</style>
+
+<body style="background-color: #9de2ff;">
+        {% if user.is_authenticated %}
+        {% load static %}
+        {% include "registered_navbar.html" %}
+        {% else %}
+        {% load static %}
+        {% include "general_navbar.html" %}
+        {% endif %}
+        <div class="wrapper">
+                <h4 class="logo navbar-brand text-center">
+                        <b>Post New Event:</b>
+                </h4>
+
+                <div class="card mx-auto my-3" style="padding-top: 5vh; border: solid blue; width: 40%">
+                        <div class="card-body">
+                                <div class="register" style="width: 450px;">
+                                        {% if regUser.is_verified %}
+                                        <form method="POST" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <label style="padding-left: 1rem"
+                                                        for="eventname"><b>{{eventform.name.label}}</b><br>
+                                                        {{eventform.name}}</label><br>
+
+                                                <label style="padding-left: 1rem" for="date">
+                                                        <b>{{eventform.category.label}}</b> <br>
+                                                        {{eventform.category}}</label><br>
+
+                                                <!-- <input type="text" name="eventname" id="eventname" autofocus /><br> -->
+                                                <label style="padding-left: 1rem"
+                                                        for="description"><b>{{eventform.desc.label}}</b><br>
+                                                        {{eventform.desc}}</label><br>
+
+                                                <!-- <textarea name="description" id="description" ></textarea><br> -->
+                                                <label style="padding-left: 1rem" for="date">
+                                                        <b>{{eventform.datetime.label}}
+                                                        </b> <br>
+                                                        {{eventform.datetime}}</label><br>
+
+
+                                                <label style="padding-left: 1rem"
+                                                        for="Address"><b>{{addressform.street.label}}</b><br>{{addressform.street}}</label><br>
+                                                <label style="padding-left: 1rem"
+                                                        for="Address"><b>{{addressform.city.label}}</b><br>{{addressform.city}}</label><br>
+                                                <label style="padding-left: 1rem"
+                                                        for="Address"><b>{{addressform.state.label}}</b><br>{{addressform.state}}</label><br>
+                                                <label style="padding-left: 1rem"
+                                                        for="Address"><b>{{addressform.country.label}}</b><br>{{addressform.country}}</label><br>
+                                                <label style="padding-left: 1rem"
+                                                        for="Address"><b>{{addressform.zipcode.label}}</b><br>{{addressform.zipcode}}</label><br>
+
+
+                                                <!-- <label id="tag"> <b>Tags</b></label><br>
+                                                        <div style="width: 350px;" class="tag-container">
+                                                                <input placeholder="add tags..." class="input"/>
+                                                        </div>
+                                                </label><br> -->
+
+                                                <!-- <label for="User"><b>User</b><br>{{eventform.user}}</label><br> -->
+                                                <!-- <input type="text" name="address" id="address" /><br>
+                                                <label for="City"> <b>City</b></label><br>
+                                                <input type="text" name="city" id="city" /><br>
+                                                <label for="State"> <b>State</b> </label><br>
+                                                <input type="text" name="State" id="State" /><br>
+                                                <label for="zipcode"> <b>Zipcode</b></label><br>
+                                                <input type="text" name="Zipcode" id="Zipcode" /><br><br> -->
+                                                <!--
+                                                <label style="padding-left: 1rem" for="name">
+                                                        <b>{{eventform.banner.label}}</b>
+                                                        <br>{{eventform.banner}}
+                                                </label><br> 
+                                                -->
+
+                                                <label style="padding-left: 1rem"
+                                                        for="Address"><b>{{eventform.banner.label}}</b></label><br>
+                                                {% include 'imageUpload.html' with iuID="banner" iuAttribute="banner" iuDisplayType="plain" iuButtonText="Select Event Banner" iuContainerClass="d-flex flex-row-reverse align-items-center justify-content-around mt-1" %}
+                                                <br>
+                                                <!-- <a class="col" href="/createdEvent"> -->
+                                                <button class="btn btn-primary pt-2" type="submit">
+                                                        Post Event
+                                                </button>
+                                                <!-- </a> -->
+
+
+                                        </form>
+                                        {% elif not user.is_authenticated %}
+                                        <div class="card-body">
+                                                <h1 style="text-align: center">You need to be logged in and verified to
+                                                        create a
+                                                        group!</h1>
+                                                <h4 style="text-align: center"><a href="/register/">🐱Register
+                                                                here!</a>•Already
+                                                        registered?•<a href="/login/">Login Here!🐱</a></h4>
+                                        </div>
+                                        {% elif user.is_authenticated and regUser.is_verified != True %}
+                                        <div class="card-body">
+                                                <h1 style="text-align: center">You need to be verified to create a
+                                                        group!</h1>
+                                                <h4 style="text-align: center"><a href="/profile/">🐱Upload Verification
+                                                                Here!</a><br />•Already Uploaded?• Wait for an admin to
+                                                        verify
+                                                        your account!🐱</h4>
+                                        </div>
+                                        {% endif %}
+
+
+                                </div>
+                        </div>
+                </div>
+        </div>
+        {% include "footer.html"%}
+</body>
+
+</html>
+
+<style>
+        .tags {
+                width: 60%;
+                margin: 40px;
+        }
+
+        .tag-container {
+                border: 2px solid #ccc;
+                padding: 10px;
+                border-radius: 5px;
+                display: flex;
+                overflow: scroll;
+        }
+
+        .tag-container .tag {
+                padding: 5px;
+                border: 1px solid #ccc;
+                margin: 5px;
+                display: flex;
+                align-items: center;
+                border-radius: 3px;
+                background: #f2f2f2;
+        }
+
+        .close {
+                font-size: 16px;
+                margin-left: 5px;
+        }
+
+        .tag-container input {
+                flex: 1;
+                font-size: 16px;
+                padding: 5px;
+                outline: none;
+                border: 0;
+                padding-bottom: 20px;
+        }
+</style>
+<script>
+        //for tags input box
+        const tagContainer = document.querySelector(".tag-container");
+        const input = document.querySelector(".tag-container input");
+        var tags = [];
+
+        function createTag(label) {
+                const div = document.createElement("div");
+                div.setAttribute('class', 'tag');
+                const span = document.createElement('span');
+                span.innerHTML = label;
+                const closeBtn = document.createElement('button');
+                closeBtn.setAttribute('class', 'close');
+                closeBtn.setAttribute('data-item', label);
+                closeBtn.innerHTML = "x";
+
+                div.appendChild(span);
+                div.appendChild(closeBtn);
+
+                return div;
+        }
+        function reset() {
+
+        }
+        //reset so the input is not duplicated 
+        function reset() {
+                document.querySelectorAll(".tag").forEach(function (tag) {
+                        tag.parentElement.removeChild(tag);
+                })
+        }
+        //add tags to array
+        function addTags() {
+                reset();
+                tags.slice().reverse().forEach(function (tag) {
+                        const input = createTag(tag);
+                        tagContainer.prepend(input);
+                })
+        }
+        //tiggers add tag when spacebar is hit and resets input value
+        input.addEventListener('keyup', function (e) {
+                if (e.key === " ") {
+                        tags.push(input.value);
+                        addTags();
+                        input.value = " ";
+                }
+        })
+        //remove tags
+        document.addEventListener("click", function (e) {
+                const value = e.target.getAttribute('data-item');
+                const index = tags.indexOf(value);
+                tags = [...tags.slice(0, index), ...tags.slice(index + 1)];
+                addTags();
+
+        })
+
+</script>

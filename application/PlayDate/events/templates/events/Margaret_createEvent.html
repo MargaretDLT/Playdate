@@ -1,0 +1,167 @@
+{% load static %}
+{% include "header.html" %}
+
+<body style="background-color: #9de2ff;">
+        {% if user.is_authenticated %}
+        {% load static %}
+        {% include "registered_navbar.html" %}
+        {% else %}
+        {% load static %}
+        {% include "general_navbar.html" %}
+        {% endif %}
+
+
+        <br />
+        <br />
+        <br />
+        <h4 class="logo navbar-brand text-center">
+                <b>Post New Event:</b>
+        </h4>
+
+        <div class="card mx-auto my-3" style="width: 30rem;">
+                <div class="card-body">
+                        <div class="register" style="width: 450px; padding-left: 40px;" >
+
+                                <label for="eventname"><b>Event Name</b> </label><br>
+                                <input style="width: 350px;" type="text" name="eventname" id="eventname" autofocus placeholder="Event Name"/><br>
+                                <label for="description"><b>Description</b> </label><br>
+                                <textarea style="width: 350px;" name="description" id="description" placeholder="add description..."></textarea><br>
+                                <label for="date"> <b>Date </b></label><br>
+                                <input style="width: 350px;" type="text" name="date" id="date" placeholder="MM/DD/YYYY"/><br>
+                                <label for="time"> <b>Time</b> </label><br>
+                                <input style="width: 350px;" type="text" name="time" id="time" placeholder="12:00pm"/><br>
+                                <label for="Address"><b>Street address</b></label><br>
+                                <input style="width: 350px;" type="text" name="address" id="address" placeholder="Address"/><br>
+                                <label for="City"> <b>City</b></label><br>
+                                <input style="width: 350px;" type="text" name="city" id="city" placeholder="City"/><br>
+                                <label for="State"> <b>State</b> </label><br>
+                                <input style="width: 350px;" type="text" name="State" id="State" placeholder="State"/><br>
+                                <label for="zipcode"> <b>Zip Code</b></label><br>
+                                <input style="width: 350px;" type="text" name="Zipcode" id="Zipcode" placeholder="Zip"/><br>
+
+                                <label id="tag"> <b>Tags</b></label><br>
+                                        <div class="tag-container">
+                                                <input placeholder="add tags..." class="input"/>
+                                        </div>
+                                </label><br>
+
+
+                                <label for="name">
+                                        <b>Select an image</b>
+                                        <input type="file" id="file-input" accept="image/*" /><br>
+                                </label><br>
+                                <br>
+                                <a class="col" href="/createdEvent">
+                                        <button class="btn btn-primary pt-2" >
+                                                Post Event
+                                        </button>
+                                </a>
+                        </div>
+                </div>
+        </div>
+
+        <footer class="gsfooter mt-auto bg-light py-1 d-none d-md-flex sticky-bottom">
+                <div class="container-fluid text-center text-md-left">
+                        <span class="text-dark ">
+                                <a href="/termsofuse">Terms of Use | </a><a href="/privacy">Privacy Notice | </a><a
+                                        href="/helpPage">Contact
+                                        Us</a><br>
+                        </span>
+                        <span class="text-dark">Copyright © 2022 TheBabySitters. All rights reserved.</span>
+                </div>
+
+        </footer>
+</body>
+
+</html>
+<style>
+
+        .tags{
+                width: 60%;
+                margin: 40px;
+        }
+        .tag-container{
+                border: 2px solid #ccc;
+                padding: 10px;
+                border-radius: 5px;
+                display: flex;
+                overflow: scroll;
+        }
+        .tag-container .tag{
+                padding: 5px;
+                border: 1px solid #ccc;
+                margin: 5px;
+                display: flex;
+                align-items: center;
+                border-radius: 3px;
+                background: #f2f2f2;
+        }
+        .close {
+                font-size: 16px;
+                margin-left: 5px;
+        }
+        .tag-container input{
+                flex: 1;
+                font-size: 16px;
+                padding: 5px;
+                outline: none;
+                border: 0;
+                padding-bottom: 20px;
+        }
+</style>
+<script>
+        //for tags input box
+        const tagContainer = document.querySelector(".tag-container");
+        const input = document.querySelector(".tag-container input");
+        var tags = [];
+
+        function createTag(label) {
+                const div = document.createElement("div");
+                div.setAttribute('class','tag');
+                const span = document.createElement('span');
+                span.innerHTML = label;
+                const closeBtn = document.createElement('button');
+                closeBtn.setAttribute('class', 'close');
+                closeBtn.setAttribute('data-item', label);
+                closeBtn.innerHTML = "x";
+
+                div.appendChild(span);
+                div.appendChild(closeBtn);
+
+                return div;
+        }
+        function reset(){
+
+        }
+        //reset so the input is not duplicated 
+        function reset(){
+                document.querySelectorAll(".tag").forEach(function(tag){
+                        tag.parentElement.removeChild(tag);
+                })
+        }
+        //add tags to array
+        function addTags(){
+                reset();
+                tags.slice().reverse().forEach(function(tag){
+                        const input = createTag(tag);
+                        tagContainer.prepend(input);
+                })
+        }
+        //tiggers add tag when Enter it hit and resets input value
+        input.addEventListener('keyup', function(e){
+                if(e.key === "Enter"){
+                        tags.push(input.value);
+                        addTags();
+                        input.value = " ";
+                }
+        })
+        //remove tags
+        document.addEventListener("click", function(e){
+                const value = e.target.getAttribute('data-item');
+                const index = tags.indexOf(value);
+                tags = [...tags.slice(0, index), ...tags.slice(index + 1)];                        
+                addTags();
+                
+        })
+       
+</script>

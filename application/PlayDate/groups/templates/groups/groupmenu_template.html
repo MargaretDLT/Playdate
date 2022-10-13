@@ -1,0 +1,13 @@
+{% if isMember == True %}
+<form method="POST">
+    {% csrf_token %}
+    <a name="mainPage" href={% url 'groupView' group_id=group.group_id %} class="list-group-item list-group-item-action py-2 ripple" aria-current="true" type="submit"><i class="fas fa-lock fa-fw me-3"></i><span>Back to Group Page</span></a>
+    <button name="newPost" class="list-group-item list-group-item-action py-2 ripple" aria-current="true" type="submit"><i class="fas fa-lock fa-fw me-3"></i><span>New Post</span></button>
+    <button name="newGroupEvent" class="list-group-item list-group-item-action py-2 ripple" aria-current="true" type="submit"><i class="fas fa-lock fa-fw me-3"></i><span>New Event</span></button>
+    <button name="leaveGroup" class="list-group-item list-group-item-action py-2 ripple" aria-current="true" type="submit"><i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Leave Group</span></button>
+    {% if group.group_admin == request.user%}
+    <a name="adminDashboard" class="list-group-item list-group-item-action py-2 ripple" aria-current="true" type="submit"><i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Admin Dashboard</span></a>
+    {% endif %} {% elif isMember == False %}
+</form>
+
+{% endif %}
